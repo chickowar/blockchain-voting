@@ -22,7 +22,7 @@ export default function SideBar(){
 
         <div className='sidebar-icon' onClick={()=>{navigate('/1')}}><FaPlus size={60}/></div>
         <div className='sidebar-icon' onClick={()=>{navigate('/login')}}><FaUser size={60}/></div>
-        <div className='sidebar-icon' onClick={()=>{navigate('/3')}}><FaVoteYea size={60}/></div>
+        <div className='sidebar-icon' onClick={()=>{navigate('/vote/1')}}><FaVoteYea size={60}/></div>
 
     </div>
 </>

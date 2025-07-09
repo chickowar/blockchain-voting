@@ -5,6 +5,7 @@ import SideBar from "./components/SideBar.jsx";
 import {BrowserRouter, Route, Router, Routes} from "react-router-dom";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
+import VotingPage from "./pages/VotingPage.jsx";
 
 function BlankPage({body}) {
   return <div className="flex h-screen w-screen clip">
@@ -27,28 +28,31 @@ function BlankPage({body}) {
 
 function App() {
 
+    return (
+        <BrowserRouter>
+            <Routes>
+                <Route
+                    path="/"
+                    element={<BlankPage body={<span>Main</span>}/>}
+                />
 
-  return (
+                <Route
+                    path="/vote/:id"
+                    element={<BlankPage body={<VotingPage/>}/>}
+                />
 
-      <BrowserRouter>
-        <Routes>
-            <Route
-                path="/"
-                element={<BlankPage body={<span>Main</span>}/>}
-            />
+                <Route
+                    path="/login"
+                    element={<BlankPage body={<LoginPage/>}/>}
+                />
 
-            <Route
-                path="/login"
-                element={<BlankPage body={<LoginPage/>}/>}
-            />
+                <Route
+                    path="*"
+                    element={<BlankPage body={<NotFoundPage/>} />}
+                />
 
-            <Route
-                path="*"
-                element={<BlankPage body={<NotFoundPage/>} />}
-            />
-
-        </Routes>
-      </BrowserRouter>
+            </Routes>
+        </BrowserRouter>
   );
 }
 
