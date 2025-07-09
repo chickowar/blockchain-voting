@@ -1,0 +1,21 @@
+@reference '../index.css'
+@tailwind utilities;
+
+
+.centered-404-page {
+    @apply relative flex flex-col items-center justify-center
+        w-full h-11/12 font-bold text-9xl overflow-clip text-primary
+    ;
+}
+
+.centered-404-page > * {
+    @apply absolute top-1/2 left-1/2 text-center
+    /*mix-blend-difference*/
+    ;
+    transform: translate(-50%, -50%);
+}
+
+
+.centered-404-page span {
+    @apply mix-blend-difference font-mono;
+}

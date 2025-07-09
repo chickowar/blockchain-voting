@@ -5,9 +5,12 @@
 
 @theme {
   --color-background: #0d0d0d;
-  --color-background-2: #151417;
+  --color-background-light: #151417;
   --color-primary: #8b5cf6;
+  --color-primary-light: #9d71f6;
+  --color-primary-dim: #705ba1;
   --color-secondary: #1f2937;
+  --color-tetriary: #403d6c;
   --color-white: #ffffff;
 }
 

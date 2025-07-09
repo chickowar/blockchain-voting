@@ -1,5 +1,6 @@
 import './SideBar.css'
 import {FaPlus, FaVoteYea, FaUser} from 'react-icons/fa'
+import {useNavigate} from "react-router-dom";
 
 function SideBarIcon(){
     return (
@@ -10,18 +11,18 @@ function SideBarIcon(){
 }
 
 export default function SideBar(){
-
+    let navigate = useNavigate();
     return (
 <>
     <div className="flex flex-col justify-evenly
     top-0 left-0
     h-screen w-1/6 m-0
-    shadow-lg bg-background-2
+    shadow-lg bg-background-light overflow-auto
     ">
 
-        <div className='sidebar-icon'><FaPlus size={60}/></div>
-        <div className='sidebar-icon'><FaUser size={60}/></div>
-        <div className='sidebar-icon'><FaVoteYea size={60}/></div>
+        <div className='sidebar-icon' onClick={()=>{navigate('/1')}}><FaPlus size={60}/></div>
+        <div className='sidebar-icon' onClick={()=>{navigate('/login')}}><FaUser size={60}/></div>
+        <div className='sidebar-icon' onClick={()=>{navigate('/3')}}><FaVoteYea size={60}/></div>
 
     </div>
 </>
