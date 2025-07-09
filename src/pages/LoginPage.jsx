@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FaArrowRight, FaUser, FaPlus, FaSignOutAlt } from "react-icons/fa";
 import { ethers } from "ethers";
+import { Identity } from "@semaphore-protocol/identity";
 
 const CONTRACT_ADDRESS = "0x8b99025ec986f9d71c67EF936061C24d6B44e9E8";
 const CONTRACT_ABI = [
@@ -15,9 +16,13 @@ export default function LoginPage() {
     const [balance, setBalance] = useState(null);
     const [status, setStatus] = useState("");
     const [counter, setCounter] = useState(null);
+    const [signer, setSigner] = useState(null);
 
     const [provider, setProvider] = useState(null);
     const [contract, setContract] = useState(null);
+
+    const [voteIdString, setVoteIdString] = useState(""); // добавляем состояние для voteIdString
+    const [identityCommitment, setIdentityCommitment] = useState(""); // для вывода commit
 
     // Подключение MetaMask
     async function connectMetaMask() {
@@ -39,6 +44,8 @@ export default function LoginPage() {
             setBalance(parseFloat(balanceEth).toFixed(4));
 
             const signer = await _provider.getSigner();
+            setSigner(signer);
+
             const _contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
             setContract(_contract);
 
@@ -49,6 +56,18 @@ export default function LoginPage() {
             console.error(err);
             setStatus("❌ Ошибка: " + err.message);
         }
+    }
+
+    async function loadIdentity(voteIdString) {
+        const sig = await signer.signMessage(`Generate Semaphore identity for ${voteIdString}`);
+        return new Identity(sig);
+    }
+
+    async function getIdentityCommitment(voteIdString) {
+        const identity = await loadIdentity(voteIdString);
+        const identityCommitment = identity.commitment;  // это bytes32
+        console.log("Identity Commitment:", identityCommitment);
+        setIdentityCommitment(identityCommitment);
     }
 
     // Получение текущего значения счетчика
@@ -135,6 +154,28 @@ export default function LoginPage() {
                                 Установить 42
                             </button>
                         </div>
+
+                        {/* Поле для ввода voteIdString */}
+                        <div className="mt-4">
+                            <input
+                                type="text"
+                                placeholder="Введите voteIdString"
+                                value={voteIdString}
+                                onChange={(e) => setVoteIdString(e.target.value)}
+                                className="px-4 py-2 border border-primary rounded-lg"
+                            />
+                            <button
+                                onClick={() => getIdentityCommitment(voteIdString)}
+                                className="ml-2 px-4 py-2 bg-primary text-white rounded-lg"
+                            >
+                                Получить Identity Commitment
+                            </button>
+                        </div>
+
+                        {/* Выводим результат identityCommitment */}
+                        {identityCommitment && (
+                            <p className="text-white mt-2">Commitment: {identityCommitment}</p>
+                        )}
 
                         <button
                             onClick={logout}
