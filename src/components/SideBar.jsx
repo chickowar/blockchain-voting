@@ -33,13 +33,13 @@ export default function SideBar() {
         shadow-lg bg-background-light overflow-clip"
             >
                 <div className="sidebar-icon" onClick={() => navigate('/create')}>
-                    <FaPlus size={60} />
+                    <FaPlus size={50} />
                 </div>
                 <div className="sidebar-icon" onClick={() => navigate('/login')}>
-                    <FaUser size={60} />
+                    <FaUser size={50} />
                 </div>
                 <div className="sidebar-icon" onClick={() => setIsModalOpen(true)}>
-                    <FaVoteYea size={60} />
+                    <FaVoteYea size={50} />
                 </div>
 
                 {/* 🪟 Modal для ввода ключа */}

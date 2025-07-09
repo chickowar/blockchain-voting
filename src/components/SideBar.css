@@ -8,7 +8,11 @@
         my-5 mx-auto
         shadow-lg
         bg-primary
-        rounded-4xl
+        rounded-[40px]
+        transition-all duration-150 ease-in-out
+        hover:bg-primary-light
+        hover:rounded-2xl
+
         /*border-2*/
     ;
 }
