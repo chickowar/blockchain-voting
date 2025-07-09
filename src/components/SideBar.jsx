@@ -16,7 +16,7 @@ export default function SideBar(){
 <>
     <div className="flex flex-col justify-evenly
     top-0 left-0
-    h-screen w-1/6 m-0
+    h-screen w-1/12  m-0
     shadow-lg bg-background-light overflow-clip
     ">
 
