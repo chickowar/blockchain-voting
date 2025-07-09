@@ -4,21 +4,20 @@ import { FaCheck } from "react-icons/fa";
 
 export default function VotingPage() {
     const { id } = useParams();
-    // TODO: ЕСЛИ КАНДИДАТЫ ИМЕЮТ ОДИНАКОВЫЕ ИМЕНА, ТО ЭТО ПЛОХО, ОНИ НЕ ПРОНУМЕРОВАНЫ. ПОТОМ ИСПРАВИТЬ
+
     const candidates = [
         "Alice", "Bob", "Charlie", "Diana",
         "Alice1", "Bob1", "Charlie1", "Diana1",
         "Alice2", "Bob2", "Charlie2", "Diana2", "Alice3", "Bob3", "Charlie3", "Diana3",
     ];
 
-    // 💥 Храним выбранных кандидатов в состоянии
     const [selectedCandidates, setSelectedCandidates] = useState([]);
 
     const toggleCandidate = (name) => {
         setSelectedCandidates((prev) =>
             prev.includes(name)
-                ? prev.filter((c) => c !== name) // убираем если уже выбран
-                : [...prev, name]               // добавляем если не выбран
+                ? prev.filter((c) => c !== name) // убрать если выбран
+                : [...prev, name]               // добавить если не выбран
         );
     };
 
@@ -35,8 +34,9 @@ export default function VotingPage() {
                                 <li
                                     key={index}
                                     onClick={() => toggleCandidate(name)}
-                                    className={`p-2 text-primary bg-white rounded-lg shadow cursor-pointer transition-colors 
-                  ${isSelected ? "bg-gray-200" : "hover:bg-gray-100"}`}
+                                    className={`p-2 rounded-lg shadow cursor-pointer transition-colors ${isSelected ? 
+                                        "text-white bg-primary hover:bg-primary-dim" : 
+                                        "bg-white hover:bg-gray-500 text-primary hover:text-primary-light"}`}
                                 >
                                     {name}
                                 </li>
@@ -48,9 +48,13 @@ export default function VotingPage() {
                 {/* 📦 Bottom block */}
                 <div className="flex justify-between items-center bg-tetriary p-4 rounded-b-xl">
                     {/* Выбранные кандидаты */}
-                    <span className="text-sm text-gray-300 truncate">
-            {selectedCandidates.join(", ") || "Никого не выбрали"}
-          </span>
+                    <div className="text-sm text-gray-300 flex-1 mr-2 overflow-hidden">
+                        <p className="break-words whitespace-normal leading-snug max-h-[4.5rem] overflow-clip">
+                            {selectedCandidates.length > 0
+                                ? selectedCandidates.join(", ")
+                                : "Никого не выбрали"}
+                        </p>
+                    </div>
 
                     {/* submit */}
                     <button
