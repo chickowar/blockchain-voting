@@ -1,11 +1,11 @@
-
-// Из public можно доставать просто по имя_файла а из assets по ./assets/имя_файла
+// Из public можно доставать просто по имя_файла а из assets по ./assets/имя_файла (вроде)
 
 import SideBar from "./components/SideBar.jsx";
 import {BrowserRouter, Route, Router, Routes} from "react-router-dom";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import VotingPage from "./pages/VotingPage.jsx";
+import CreateVotingPage from "./pages/CreateVotingPage.jsx";
 
 function BlankPage({body}) {
   return <div className="flex h-screen w-screen clip">
@@ -39,6 +39,11 @@ function App() {
                 <Route
                     path="/vote/:id"
                     element={<BlankPage body={<VotingPage/>}/>}
+                />
+
+                <Route
+                    path="/create"
+                    element={<BlankPage body={<CreateVotingPage/>}/>}
                 />
 
                 <Route
