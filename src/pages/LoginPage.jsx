@@ -2,6 +2,8 @@ import { useState } from "react";
 import { FaArrowRight, FaUser, FaPlus, FaSignOutAlt } from "react-icons/fa";
 import { ethers } from "ethers";
 import { Identity } from "@semaphore-protocol/identity";
+import {useAppContext} from "../components/AppContext.jsx";
+import {getIdentityCommitment} from "../components/VotingMethods.jsx";
 
 const CONTRACT_ADDRESS = "0x8b99025ec986f9d71c67EF936061C24d6B44e9E8";
 const CONTRACT_ABI = [
@@ -11,17 +13,38 @@ const CONTRACT_ABI = [
     "function counter() public view returns (uint256)"
 ];
 
+const VOTING_ADDRESS = "0x9bf73F06b864Dd795dFF41619569d388A9f093f4";
+const VOTING_ABI = [
+    "function createVote(bytes32 voteId, bytes32[] identityCommitments, uint256 optionsCount, uint256 votingEnd, bytes32 merkleRoot) nonpayable",
+    "constructor(address _verifier) nonpayable",
+    "function vote(bytes32 voteId, uint256 nullifierHash, uint256 option, uint256[8] proof) nonpayable",
+    "function getCommitments(bytes32 voteId) view returns (bytes32[])",
+    "function getGroup(bytes32 voteId) view returns (bytes32, uint256, uint256)",
+    "function getResults(bytes32 voteId) view returns (uint256[])",
+    "function verifier() view returns (address)"
+];
+
+
 export default function LoginPage() {
     const [account, setAccount] = useState(null);
     const [balance, setBalance] = useState(null);
     const [status, setStatus] = useState("");
     const [counter, setCounter] = useState(null);
-    const [signer, setSigner] = useState(null);
+    // const [signer, setSigner] = useState(null);
+    //
+    // const [provider, setProvider] = useState(null);
+    // const [contract, setContract] = useState(null);
+    //
+    // const [voteIdString, setVoteIdString] = useState(""); // добавляем состояние для voteIdString
 
-    const [provider, setProvider] = useState(null);
-    const [contract, setContract] = useState(null);
+    const {
+        signer, setSigner,
+        provider, setProvider,
+        contract, setContract,
+        setVotingContract,
+        voteIdString, setVoteIdString,
+    } = useAppContext();  // Используем контекст
 
-    const [voteIdString, setVoteIdString] = useState(""); // добавляем состояние для voteIdString
     const [identityCommitment, setIdentityCommitment] = useState(""); // для вывода commit
 
     // Подключение MetaMask
@@ -49,6 +72,9 @@ export default function LoginPage() {
             const _contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
             setContract(_contract);
 
+            const _votingContract = new ethers.Contract(VOTING_ADDRESS, VOTING_ABI, signer);
+            setVotingContract(_votingContract);
+
             await fetchCounter(_contract, _provider);
 
             setStatus("✅ MetaMask подключен");
@@ -56,18 +82,6 @@ export default function LoginPage() {
             console.error(err);
             setStatus("❌ Ошибка: " + err.message);
         }
-    }
-
-    async function loadIdentity(voteIdString) {
-        const sig = await signer.signMessage(`Generate Semaphore identity for ${voteIdString}`);
-        return new Identity(sig);
-    }
-
-    async function getIdentityCommitment(voteIdString) {
-        const identity = await loadIdentity(voteIdString);
-        const identityCommitment = identity.commitment;  // это bytes32
-        console.log("Identity Commitment:", identityCommitment);
-        setIdentityCommitment(identityCommitment);
     }
 
     // Получение текущего значения счетчика
@@ -165,7 +179,7 @@ export default function LoginPage() {
                                 className="px-4 py-2 border border-primary rounded-lg"
                             />
                             <button
-                                onClick={() => getIdentityCommitment(voteIdString)}
+                                onClick={() => getIdentityCommitment(voteIdString, setIdentityCommitment, signer)}
                                 className="ml-2 px-4 py-2 bg-primary text-white rounded-lg"
                             >
                                 Получить Identity Commitment
