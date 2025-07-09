@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaPlus, FaTrash, FaCheck } from "react-icons/fa";
+import { FaPlus, FaSpinner, FaTrash, FaCheck } from "react-icons/fa";
 import Modal from "../components/Modal.jsx";
 
 export default function CreateVotingPage() {
@@ -10,11 +10,13 @@ export default function CreateVotingPage() {
     const [newVoter, setNewVoter] = useState("");
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-
-    // Новые поля для Modal
     const [votingTitle, setVotingTitle] = useState("");
     const [endDateTime, setEndDateTime] = useState("");
     const [timeLeft, setTimeLeft] = useState("");
+
+    const [loading, setLoading] = useState(false);
+    const [resultMessage, setResultMessage] = useState("");
+    const [errorMessages, setErrorMessages] = useState([]);
 
     // ➕ Добавление кандидата
     const handleAddCandidate = () => {
@@ -60,7 +62,19 @@ export default function CreateVotingPage() {
 
     // ✅ Submit → открыть Modal
     const handleSubmit = () => {
+        setResultMessage("");
+        setErrorMessages([]);
         setIsModalOpen(true);
+        setDefaultEndDateTime();
+    };
+
+    // 🗓️ Установить дату по умолчанию (завтра)
+    const setDefaultEndDateTime = () => {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const isoString = tomorrow.toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
+        setEndDateTime(isoString);
+        calculateTimeLeft(isoString);
     };
 
     // 🕓 Рассчитать разницу во времени
@@ -79,21 +93,57 @@ export default function CreateVotingPage() {
         }
     };
 
+    // ✅ Проверка данных перед созданием
+    const validateVotingData = () => {
+        const errors = [];
+        const now = new Date();
+        const end = new Date(endDateTime);
+
+        if (votingTitle.trim() === "") {
+            errors.push("Название голосования не указано.");
+        }
+        if (candidates.length === 0) {
+            errors.push("Добавьте хотя бы одного кандидата.");
+        }
+        if (voters.length === 0) {
+            errors.push("Добавьте хотя бы одного голосующего.");
+        }
+        if (isNaN(end.getTime()) || end <= now) {
+            errors.push("Дата окончания должна быть в будущем.");
+        }
+
+        return errors;
+    };
+
     // 📤 Финальное создание голосования
     const handleCreateVoting = () => {
-        const targetDate = new Date(endDateTime);
-        const now = new Date();
-        const endsInSeconds = Math.max(Math.floor((targetDate - now) / 1000), 0);
+        setLoading(true);
+        setResultMessage("");
+        setErrorMessages([]);
 
-        console.log("Создано голосование:", {
-            title: votingTitle,
-            candidates,
-            voters,
-            endsInSeconds,
-        });
+        setTimeout(() => {
+            const errors = validateVotingData();
 
-        // Закрыть Modal и очистить поля (если нужно)
-        setIsModalOpen(false);
+            if (errors.length > 0) {
+                setErrorMessages(errors);
+                setResultMessage("");
+            } else {
+                const targetDate = new Date(endDateTime);
+                const now = new Date();
+                const endsInSeconds = Math.max(Math.floor((targetDate - now) / 1000), 0);
+
+                console.log("Создано голосование:", {
+                    title: votingTitle,
+                    candidates,
+                    voters,
+                    endsInSeconds,
+                });
+
+                setResultMessage(`Голосование "${votingTitle}" создано!`);
+            }
+
+            setLoading(false);
+        }, 500);
     };
 
     return (
@@ -208,11 +258,11 @@ export default function CreateVotingPage() {
 
 
 
-            {/* Modal */}
+            {/* 🪟 Modal */}
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
                 <h3 className="text-lg font-bold mb-4">Подтверждение данных</h3>
 
-                {/* Название голосования */}
+                {/* Название */}
                 <div className="mb-4">
                     <label className="block font-medium mb-1">Название голосования:</label>
                     <input
@@ -224,7 +274,7 @@ export default function CreateVotingPage() {
                     />
                 </div>
 
-                {/* Дата и время окончания */}
+                {/* Дата окончания */}
                 <div className="mb-4">
                     <label className="block font-medium mb-1">Дата и время окончания:</label>
                     <input
@@ -268,14 +318,36 @@ export default function CreateVotingPage() {
                     </div>
                 </div>
 
-                {/* Кнопка создания */}
-                <button
-                    onClick={handleCreateVoting}
-                    className="w-full py-3 bg-primary text-white rounded-lg hover:bg-primary-light transition-colors"
-                >
-                    <FaCheck className="inline mr-2" />
-                    Создать голосование
-                </button>
+                {/* Ошибки */}
+                {errorMessages.length > 0 && (
+                    <div className="mb-4 text-red-600">
+                        {errorMessages.map((err, i) => (
+                            <p key={i}>• {err}</p>
+                        ))}
+                    </div>
+                )}
+
+                {/* Результат */}
+                {resultMessage && (
+                    <div className="mb-4 text-green-600 font-semibold">
+                        {resultMessage}
+                    </div>
+                )}
+
+                {/* Лоадер или кнопка */}
+                {loading ? (
+                    <div className="flex justify-center py-4">
+                        <FaSpinner className="animate-spin text-primary text-2xl" />
+                    </div>
+                ) : resultMessage === "" ? (
+                    <button
+                        onClick={handleCreateVoting}
+                        className="w-full py-3 bg-primary text-white rounded-lg hover:bg-primary-light transition-colors"
+                    >
+                        <FaCheck className="inline mr-2" />
+                        Создать голосование
+                    </button>
+                ) : null}
             </Modal>
         </>
     );
