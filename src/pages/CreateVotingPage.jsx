@@ -294,7 +294,7 @@ export default function CreateVotingPage() {
                 {/* Кандидаты и голосующие */}
                 <div className="flex gap-4 mb-4">
                     {/* Список кандидатов */}
-                    <div className="flex-1 bg-gray-100 rounded-lg p-3 max-h-[50ch] overflow-y-auto">
+                    <div className="flex-1 bg-gray-100 rounded-lg p-3 max-h-[30ch] overflow-y-auto">
                         <p className="font-medium mb-2">Кандидаты:</p>
                         <ol className="list-decimal list-inside text-gray-700">
                             {candidates.length ? (
@@ -306,7 +306,7 @@ export default function CreateVotingPage() {
                     </div>
 
                     {/* Список голосующих */}
-                    <div className="flex-1 bg-gray-100 rounded-lg p-3 max-h-[50ch] overflow-y-auto">
+                    <div className="flex-1 bg-gray-100 rounded-lg p-3 max-h-[30ch] overflow-y-auto">
                         <p className="font-medium mb-2">Голосующие:</p>
                         <ol className="list-decimal list-inside text-gray-700">
                             {voters.length ? (
