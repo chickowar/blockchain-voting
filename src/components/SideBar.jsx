@@ -4,6 +4,14 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import Modal from "./Modal.jsx";
 
+function SideBarIcon({onClick, icon}){
+    return <div className="flex items-center w-full h-24 my-6">
+        <div className="sidebar-icon" onClick={onClick}>
+            {icon({className: "w-2/3 h-2/3"})}
+        </div>
+    </div>
+}
+
 export default function SideBar() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [voteKey, setVoteKey] = useState("");
@@ -32,19 +40,13 @@ export default function SideBar() {
         h-screen w-1/12 m-0
         shadow-lg bg-background-light overflow-clip"
             >
-                <div className="sidebar-icon" onClick={() => navigate('/create')}>
-                    <FaPlus className='w-3/4 h-3/4' />
-                </div>
-                <div className="sidebar-icon" onClick={() => navigate('/login')}>
-                    <FaUser className='w-3/4 h-3/4 pb-1' />
-                </div>
-                <div className="sidebar-icon" onClick={() => setIsModalOpen(true)}>
-                    <FaVoteYea
-                        className='w-3/4 h-3/4'
-                    />
-                </div>
+                <SideBarIcon icon={FaPlus} onClick={() => navigate('/create')}/>
 
-                {/* 🪟 Modal для ввода ключа */}
+                <SideBarIcon icon={FaUser} onClick={() => navigate('/login')}/>
+
+                <SideBarIcon icon={FaVoteYea} onClick={() => setIsModalOpen(true)}/>
+
+                {/* Modal для ввода ключа */}
                 <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
                     <h3 className="text-lg font-bold mb-4">Введите ключ голосования</h3>
                     <div className="flex">
