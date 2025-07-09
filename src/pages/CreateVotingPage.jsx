@@ -171,7 +171,7 @@ export default function CreateVotingPage() {
                 </div>
             </div>
 
-            {/* 🪟 Modal */}
+            {/* Modal */}
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
                 <h3 className="text-lg font-bold mb-4">Подтверждение данных</h3>
                 <p className="mb-2 font-medium">Кандидаты:</p>
