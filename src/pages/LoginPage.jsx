@@ -110,7 +110,7 @@ export default function LoginPage() {
 
     return (
         <div className="flex items-center justify-center min-h-screen">
-            <div className="flex flex-col items-center space-y-6 p-8 bg-secondary rounded-xl shadow-lg">
+            <div className="flex flex-col items-center space-y-6 p-8 bg-secondary rounded-xl shadow-lg w-[50ch]">
                 <FaUser size={120} className="text-primary" />
 
                 {account ? (

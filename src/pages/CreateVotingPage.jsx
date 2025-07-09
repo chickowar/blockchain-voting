@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { FaPlus, FaTrash, FaCheck } from "react-icons/fa";
+import Modal from "../components/Modal.jsx";
 
 export default function CreateVotingPage() {
     const [candidates, setCandidates] = useState([]);
@@ -7,6 +8,8 @@ export default function CreateVotingPage() {
 
     const [voters, setVoters] = useState([]);
     const [newVoter, setNewVoter] = useState("");
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     // ➕ Добавление кандидата
     const handleAddCandidate = () => {
@@ -50,124 +53,140 @@ export default function CreateVotingPage() {
         setVoters(updatedVoters);
     };
 
-    // ✅ Submit → вывод в консоль обоих массивов
+    // ✅ Submit → открыть Modal
     const handleSubmit = () => {
-        console.log("Текущие данные:", {
-            candidates,
-            voters
-        });
+        setIsModalOpen(true);
     };
 
     return (
-        <div className="flex justify-evenly items-stretch h-screen">
-            {/* 📦 Левая часть */}
-            <div className="flex-1 m-20 bg-secondary rounded-xl shadow-lg flex flex-col">
-                <h2 className="text-2xl text-center font-bold mt-5 mb-4">
-                    Candidates
-                </h2>
+        <>
+            <div className="flex justify-evenly items-stretch h-screen">
+                {/* 📦 Левая часть */}
+                <div className="flex-1 m-20 bg-secondary rounded-xl shadow-lg flex flex-col">
+                    <h2 className="text-2xl text-center font-bold mt-5 mb-4">
+                        Candidates
+                    </h2>
 
-                {/* ➕ Добавление кандидата */}
-                <div className="flex px-6 mb-4">
-                    <input
-                        type="text"
-                        value={newCandidate}
-                        onChange={(e) => setNewCandidate(e.target.value)}
-                        placeholder="Введите имя кандидата"
-                        className="flex-grow p-2 rounded-l-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary"
-                    />
-                    <button
-                        onClick={handleAddCandidate}
-                        className="px-4 bg-primary text-white rounded-r-lg hover:bg-primary-light transition-colors"
-                    >
-                        <FaPlus />
-                    </button>
-                </div>
+                    {/* ➕ Добавление кандидата */}
+                    <div className="flex px-6 mb-4">
+                        <input
+                            type="text"
+                            value={newCandidate}
+                            onChange={(e) => setNewCandidate(e.target.value)}
+                            placeholder="Введите имя кандидата"
+                            className="flex-grow p-2 rounded-l-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary"
+                        />
+                        <button
+                            onClick={handleAddCandidate}
+                            className="px-4 bg-primary text-white rounded-r-lg hover:bg-primary-light transition-colors"
+                        >
+                            <FaPlus />
+                        </button>
+                    </div>
 
-                {/* 📋 Список кандидатов */}
-                <div className="flex-1 px-6 overflow-y-auto">
-                    <ul className="space-y-2">
-                        {candidates.map((name, index) => (
-                            <li
-                                key={index}
-                                className="p-2 bg-white rounded-lg shadow flex items-center justify-between"
-                            >
-                                <input
-                                    type="text"
-                                    value={name}
-                                    onChange={(e) => handleEditCandidate(index, e.target.value)}
-                                    className="flex-grow bg-transparent border-none focus:outline-none text-primary"
-                                />
-                                <button
-                                    onClick={() => handleDeleteCandidate(index)}
-                                    className="ml-2 text-red-500 hover:text-red-700"
+                    {/* 📋 Список кандидатов */}
+                    <div className="flex-1 px-6 overflow-y-auto">
+                        <ul className="space-y-2">
+                            {candidates.map((name, index) => (
+                                <li
+                                    key={index}
+                                    className="p-2 bg-white rounded-lg shadow flex items-center justify-between"
                                 >
-                                    <FaTrash />
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
+                                    <input
+                                        type="text"
+                                        value={name}
+                                        onChange={(e) => handleEditCandidate(index, e.target.value)}
+                                        className="flex-grow bg-transparent border-none focus:outline-none text-primary"
+                                    />
+                                    <button
+                                        onClick={() => handleDeleteCandidate(index)}
+                                        className="ml-2 text-red-500 hover:text-red-700"
+                                    >
+                                        <FaTrash />
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* 🔘 Submit Button */}
+                    <div className="p-4">
+                        <button
+                            onClick={handleSubmit}
+                            className="w-full py-3 bg-primary text-white rounded-lg hover:bg-primary-light transition-colors"
+                        >
+                            <FaCheck className="inline mr-2" />
+                            Submit
+                        </button>
+                    </div>
                 </div>
 
-                {/* 🔘 Submit Button */}
-                <div className="p-4">
-                    <button
-                        onClick={handleSubmit}
-                        className="w-full py-3 bg-primary text-white rounded-lg hover:bg-primary-light transition-colors"
-                    >
-                        <FaCheck className="inline mr-2" />
-                        Submit
-                    </button>
+                {/* 📦 Правая часть */}
+                <div className="flex-1 m-20 bg-secondary rounded-xl shadow-lg flex flex-col">
+                    <h2 className="text-2xl text-center font-bold mt-5 mb-4">
+                        Voters
+                    </h2>
+
+                    {/* ➕ Добавление голосующего */}
+                    <div className="flex px-6 mb-4">
+                        <input
+                            type="text"
+                            value={newVoter}
+                            onChange={(e) => setNewVoter(e.target.value)}
+                            placeholder="Введите имя голосующего"
+                            className="flex-grow p-2 rounded-l-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary"
+                        />
+                        <button
+                            onClick={handleAddVoter}
+                            className="px-4 bg-primary text-white rounded-r-lg hover:bg-primary-light transition-colors"
+                        >
+                            <FaPlus />
+                        </button>
+                    </div>
+
+                    {/* 📋 Список голосующих */}
+                    <div className="flex-1 px-6 overflow-y-auto">
+                        <ul className="space-y-2">
+                            {voters.map((name, index) => (
+                                <li
+                                    key={index}
+                                    className="p-2 bg-white rounded-lg shadow flex items-center justify-between"
+                                >
+                                    <input
+                                        type="text"
+                                        value={name}
+                                        onChange={(e) => handleEditVoter(index, e.target.value)}
+                                        className="flex-grow bg-transparent border-none focus:outline-none text-primary"
+                                    />
+                                    <button
+                                        onClick={() => handleDeleteVoter(index)}
+                                        className="ml-2 text-red-500 hover:text-red-700"
+                                    >
+                                        <FaTrash />
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
                 </div>
             </div>
 
-            {/* 📦 Правая часть */}
-            <div className="flex-1 m-20 bg-secondary rounded-xl shadow-lg flex flex-col">
-                <h2 className="text-2xl text-center font-bold mt-5 mb-4">
-                    Voters
-                </h2>
-
-                {/* ➕ Добавление голосующего */}
-                <div className="flex px-6 mb-4">
-                    <input
-                        type="text"
-                        value={newVoter}
-                        onChange={(e) => setNewVoter(e.target.value)}
-                        placeholder="Введите имя голосующего"
-                        className="flex-grow p-2 rounded-l-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary"
-                    />
-                    <button
-                        onClick={handleAddVoter}
-                        className="px-4 bg-primary text-white rounded-r-lg hover:bg-primary-light transition-colors"
-                    >
-                        <FaPlus />
-                    </button>
-                </div>
-
-                {/* 📋 Список голосующих */}
-                <div className="flex-1 px-6 overflow-y-auto">
-                    <ul className="space-y-2">
-                        {voters.map((name, index) => (
-                            <li
-                                key={index}
-                                className="p-2 bg-white rounded-lg shadow flex items-center justify-between"
-                            >
-                                <input
-                                    type="text"
-                                    value={name}
-                                    onChange={(e) => handleEditVoter(index, e.target.value)}
-                                    className="flex-grow bg-transparent border-none focus:outline-none text-primary"
-                                />
-                                <button
-                                    onClick={() => handleDeleteVoter(index)}
-                                    className="ml-2 text-red-500 hover:text-red-700"
-                                >
-                                    <FaTrash />
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            </div>
-        </div>
+            {/* 🪟 Modal */}
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                <h3 className="text-lg font-bold mb-4">Подтверждение данных</h3>
+                <p className="mb-2 font-medium">Кандидаты:</p>
+                <ul className="mb-4 list-disc list-inside text-gray-700">
+                    {candidates.map((c, i) => (
+                        <li key={i}>{c}</li>
+                    ))}
+                </ul>
+                <p className="mb-2 font-medium">Голосующие:</p>
+                <ul className="list-disc list-inside text-gray-700">
+                    {voters.map((v, i) => (
+                        <li key={i}>{v}</li>
+                    ))}
+                </ul>
+            </Modal>
+        </>
     );
 }
