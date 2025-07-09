@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FaArrowRight, FaUser, FaPlus, FaSignOutAlt } from "react-icons/fa";
 import { ethers } from "ethers";
+import { Identity } from "@semaphore-protocol/identity";
 import {useAppContext} from "../components/AppContext.jsx";
 import {getIdentityCommitment} from "../components/VotingMethods.jsx";
 

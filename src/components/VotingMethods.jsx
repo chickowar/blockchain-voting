@@ -2,8 +2,7 @@ import { ethers } from "ethers";
 import { Identity } from "@semaphore-protocol/identity";
 import { Group }    from "@semaphore-protocol/group";
 import {
-    generateProof,
-    packToSolidityProof
+    generateProof
 } from "@semaphore-protocol/proof";
 
 export async function loadIdentity(voteIdString, signer) {
@@ -94,14 +93,13 @@ async function castVote(voteIdString, option, votingContract) {
         externalNullifier,
         option
     );
-    const solidityProof = packToSolidityProof(proof);
 
     // 2.7) Отправляем голос
     const tx = await votingContract.vote(
         voteId,
         BigInt(nullifierHash),
         option,
-        solidityProof
+        proof
     );
     console.log("castVote tx:", tx.hash);
     await tx.wait();
