@@ -11,6 +11,11 @@ export default function CreateVotingPage() {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
+    // Новые поля для Modal
+    const [votingTitle, setVotingTitle] = useState("");
+    const [endDateTime, setEndDateTime] = useState("");
+    const [timeLeft, setTimeLeft] = useState("");
+
     // ➕ Добавление кандидата
     const handleAddCandidate = () => {
         const trimmedName = newCandidate.trim();
@@ -58,14 +63,45 @@ export default function CreateVotingPage() {
         setIsModalOpen(true);
     };
 
+    // 🕓 Рассчитать разницу во времени
+    const calculateTimeLeft = (value) => {
+        const targetDate = new Date(value);
+        const now = new Date();
+        const diff = targetDate - now;
+
+        if (diff > 0) {
+            const minutes = Math.floor((diff / 1000 / 60) % 60);
+            const hours = Math.floor((diff / 1000 / 60 / 60) % 24);
+            const days = Math.floor(diff / 1000 / 60 / 60 / 24);
+            setTimeLeft(`конец через ${days} дней ${hours} часов ${minutes} минут`);
+        } else {
+            setTimeLeft("Дата уже прошла");
+        }
+    };
+
+    // 📤 Финальное создание голосования
+    const handleCreateVoting = () => {
+        const targetDate = new Date(endDateTime);
+        const now = new Date();
+        const endsInSeconds = Math.max(Math.floor((targetDate - now) / 1000), 0);
+
+        console.log("Создано голосование:", {
+            title: votingTitle,
+            candidates,
+            voters,
+            endsInSeconds,
+        });
+
+        // Закрыть Modal и очистить поля (если нужно)
+        setIsModalOpen(false);
+    };
+
     return (
         <>
             <div className="flex justify-evenly items-stretch h-screen">
                 {/* 📦 Левая часть */}
                 <div className="flex-1 m-20 bg-secondary rounded-xl shadow-lg flex flex-col">
-                    <h2 className="text-2xl text-center font-bold mt-5 mb-4">
-                        Candidates
-                    </h2>
+                    <h2 className="text-2xl text-center font-bold mt-5 mb-4">Candidates</h2>
 
                     {/* ➕ Добавление кандидата */}
                     <div className="flex px-6 mb-4">
@@ -108,24 +144,11 @@ export default function CreateVotingPage() {
                             ))}
                         </ul>
                     </div>
-
-                    {/* 🔘 Submit Button */}
-                    <div className="p-4">
-                        <button
-                            onClick={handleSubmit}
-                            className="w-full py-3 bg-primary text-white rounded-lg hover:bg-primary-light transition-colors"
-                        >
-                            <FaCheck className="inline mr-2" />
-                            Submit
-                        </button>
-                    </div>
                 </div>
 
                 {/* 📦 Правая часть */}
                 <div className="flex-1 m-20 bg-secondary rounded-xl shadow-lg flex flex-col">
-                    <h2 className="text-2xl text-center font-bold mt-5 mb-4">
-                        Voters
-                    </h2>
+                    <h2 className="text-2xl text-center font-bold mt-5 mb-4">Voters</h2>
 
                     {/* ➕ Добавление голосующего */}
                     <div className="flex px-6 mb-4">
@@ -169,23 +192,90 @@ export default function CreateVotingPage() {
                         </ul>
                     </div>
                 </div>
+
+                {/* 🔘 Submit Button по центру снизу */}
+                <div className="absolute flex bottom-0 justify-center p-6">
+                    <button
+                        onClick={handleSubmit}
+                        className="px-8 py-4 bg-primary text-xl text-white font-semibold rounded-4xl hover:bg-primary-light transition-colors shadow-lg"
+                    >
+                        <FaCheck className="inline mr-2" />
+                        Submit
+                    </button>
+                </div>
+
             </div>
+
+
 
             {/* Modal */}
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
                 <h3 className="text-lg font-bold mb-4">Подтверждение данных</h3>
-                <p className="mb-2 font-medium">Кандидаты:</p>
-                <ul className="mb-4 list-disc list-inside text-gray-700">
-                    {candidates.map((c, i) => (
-                        <li key={i}>{c}</li>
-                    ))}
-                </ul>
-                <p className="mb-2 font-medium">Голосующие:</p>
-                <ul className="list-disc list-inside text-gray-700">
-                    {voters.map((v, i) => (
-                        <li key={i}>{v}</li>
-                    ))}
-                </ul>
+
+                {/* Название голосования */}
+                <div className="mb-4">
+                    <label className="block font-medium mb-1">Название голосования:</label>
+                    <input
+                        type="text"
+                        value={votingTitle}
+                        onChange={(e) => setVotingTitle(e.target.value)}
+                        placeholder="Введите название"
+                        className="w-full p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                </div>
+
+                {/* Дата и время окончания */}
+                <div className="mb-4">
+                    <label className="block font-medium mb-1">Дата и время окончания:</label>
+                    <input
+                        type="datetime-local"
+                        value={endDateTime}
+                        onChange={(e) => {
+                            setEndDateTime(e.target.value);
+                            calculateTimeLeft(e.target.value);
+                        }}
+                        className="w-full p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                    {endDateTime && (
+                        <p className="text-sm text-gray-600 mt-1">{timeLeft}</p>
+                    )}
+                </div>
+
+                {/* Кандидаты и голосующие */}
+                <div className="flex gap-4 mb-4">
+                    {/* Список кандидатов */}
+                    <div className="flex-1 bg-gray-100 rounded-lg p-3 max-h-[50ch] overflow-y-auto">
+                        <p className="font-medium mb-2">Кандидаты:</p>
+                        <ol className="list-decimal list-inside text-gray-700">
+                            {candidates.length ? (
+                                candidates.map((c, i) => <li key={i}>{c}</li>)
+                            ) : (
+                                <li className="italic text-gray-400">Нет кандидатов</li>
+                            )}
+                        </ol>
+                    </div>
+
+                    {/* Список голосующих */}
+                    <div className="flex-1 bg-gray-100 rounded-lg p-3 max-h-[50ch] overflow-y-auto">
+                        <p className="font-medium mb-2">Голосующие:</p>
+                        <ol className="list-decimal list-inside text-gray-700">
+                            {voters.length ? (
+                                voters.map((v, i) => <li key={i}>{v}</li>)
+                            ) : (
+                                <li className="italic text-gray-400">Нет голосующих</li>
+                            )}
+                        </ol>
+                    </div>
+                </div>
+
+                {/* Кнопка создания */}
+                <button
+                    onClick={handleCreateVoting}
+                    className="w-full py-3 bg-primary text-white rounded-lg hover:bg-primary-light transition-colors"
+                >
+                    <FaCheck className="inline mr-2" />
+                    Создать голосование
+                </button>
             </Modal>
         </>
     );
