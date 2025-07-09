@@ -12,8 +12,8 @@
         transition-all duration-250 ease-in-out
         hover:bg-primary-light
         hover:rounded-2xl
-        hover:w-[calc(var(--spacing)*23)]
-        hover:h-[calc(var(--spacing)*23)]
+        hover:w-[calc(var(--spacing)*22)]
+        hover:h-[calc(var(--spacing)*22)]
 
         /*border-2*/
     ;
