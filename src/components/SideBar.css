@@ -1,0 +1,14 @@
+@reference '../index.css'
+@tailwind utilities;
+
+
+.sidebar-icon {
+    @apply relative flex justify-center items-center
+        w-20 h-20
+        my-5 mx-auto
+        shadow-lg
+        bg-primary
+        rounded-4xl
+        /*border-2*/
+    ;
+}
