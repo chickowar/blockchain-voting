@@ -9,9 +9,11 @@
         shadow-lg
         bg-primary
         rounded-[40px]
-        transition-all duration-150 ease-in-out
+        transition-all duration-250 ease-in-out
         hover:bg-primary-light
         hover:rounded-2xl
+        hover:w-[calc(var(--spacing)*23)]
+        hover:h-[calc(var(--spacing)*23)]
 
         /*border-2*/
     ;
