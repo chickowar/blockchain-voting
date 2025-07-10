@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { FaCheck } from "react-icons/fa";
-import Modal from "../components/Modal"; // 👈 import your Modal
+import Modal from "../components/Modal";
 import { castVote, getResults } from "../components/VotingMethods";
 import { useAppContext } from "../components/AppContext";
 import { ethers } from "ethers";
@@ -42,8 +42,6 @@ export default function VotingPage() {
             setError("Введите корректный номер опции");
             return;
         }
-
-        const [isModalOpen, setIsModalOpen] = useState(false);
 
         // Кодирование voteId
         const voteId = ethers.encodeBytes32String(id);

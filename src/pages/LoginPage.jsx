@@ -368,7 +368,7 @@ export default function LoginPage() {
                                         signer
                                     );
                                 }}
-                                className="ml-2 px-4 py-2 bg-primary text-white rounded-lg"
+                                className="ml-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-light"
                                 title="Получить Identity Commitment"
                             >
                                 Get I.C.
@@ -385,7 +385,7 @@ export default function LoginPage() {
                         <div className="flex justify-center">
                             <button
                                 onClick={logout}
-                                className="flex items-center mt-4 mb-8 px-4 py-2 bg-primary-dim text-white rounded-lg hover:bg-primary"
+                                className="flex items-center mb-8 px-4 py-2 bg-primary-dim text-white rounded-lg hover:bg-primary"
                             >
                                 <FaSignOutAlt className="mr-2" />
                                 Выйти
