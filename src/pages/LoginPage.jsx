@@ -4,13 +4,13 @@ import { ethers } from "ethers";
 import { useAppContext } from "../components/AppContext.jsx";
 import { getIdentityCommitment } from "../components/VotingMethods.jsx";
 
-const VOTING_ADDRESS = "0x988B2E8D3108921ee3416cA50Ed1d94984E25951";
+const VOTING_ADDRESS = "0xEf00Ff4B51FF253E4f83C20b466ca708360BDe11";
 const VOTING_ABI = [
     {
         "inputs": [
             {
                 "internalType": "address",
-                "name": "_verifier",
+                "name": "semaphoreAddress",
                 "type": "address"
             }
         ],
@@ -54,9 +54,9 @@ const VOTING_ABI = [
                 "type": "bytes32"
             },
             {
-                "internalType": "bytes32[]",
+                "internalType": "uint256[]",
                 "name": "identityCommitments",
-                "type": "bytes32[]"
+                "type": "uint256[]"
             },
             {
                 "internalType": "uint256",
@@ -90,9 +90,9 @@ const VOTING_ABI = [
         "name": "getCommitments",
         "outputs": [
             {
-                "internalType": "bytes32[]",
+                "internalType": "uint256[]",
                 "name": "",
-                "type": "bytes32[]"
+                "type": "uint256[]"
             }
         ],
         "stateMutability": "view",
@@ -139,7 +139,7 @@ const VOTING_ABI = [
         "outputs": [
             {
                 "internalType": "uint256[]",
-                "name": "",
+                "name": "counts",
                 "type": "uint256[]"
             }
         ],
@@ -147,11 +147,30 @@ const VOTING_ABI = [
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "verifier",
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "name": "groupOf",
         "outputs": [
             {
-                "internalType": "contract ISemaphoreVerifier",
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "semaphore",
+        "outputs": [
+            {
+                "internalType": "contract ISemaphore",
                 "name": "",
                 "type": "address"
             }
@@ -168,18 +187,45 @@ const VOTING_ABI = [
             },
             {
                 "internalType": "uint256",
-                "name": "nullifierHash",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
                 "name": "option",
                 "type": "uint256"
             },
             {
-                "internalType": "uint256[8]",
+                "components": [
+                    {
+                        "internalType": "uint256",
+                        "name": "merkleTreeDepth",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "merkleTreeRoot",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "nullifier",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "message",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "scope",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256[8]",
+                        "name": "points",
+                        "type": "uint256[8]"
+                    }
+                ],
+                "internalType": "struct ISemaphore.SemaphoreProof",
                 "name": "proof",
-                "type": "uint256[8]"
+                "type": "tuple"
             }
         ],
         "name": "vote",
