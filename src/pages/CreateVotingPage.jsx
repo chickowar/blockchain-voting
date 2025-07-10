@@ -247,6 +247,44 @@ export default function CreateVotingPage() {
                             ))}
                         </ul>
                     </div>
+
+                    {/*КНОПКА???*/}
+
+                    {/* 📂 Загрузка голосующих из файла */}
+                    <div className="flex px-6 mb-4">
+                        <input
+                            type="file"
+                            accept=".txt"
+                            id="voterFileInput"
+                            className="hidden"
+                            onChange={(e) => {
+                                const file = e.target.files[0];
+                                if (!file) return;
+
+                                const reader = new FileReader();
+                                reader.onload = (event) => {
+                                    const text = event.target.result;
+                                    const lines = text
+                                        .split(/\r?\n/) // handle both \n and \r\n
+                                        .map((line) => line.trim())
+                                        .filter((line) => line.length > 0 && !voters.includes(line)); // filter empty and duplicates
+
+                                    if (lines.length > 0) {
+                                        setVoters((prev) => [...prev, ...lines]);
+                                    }
+                                };
+                                reader.readAsText(file);
+                                e.target.value = ""; // reset file input so same file can be uploaded again
+                            }}
+                        />
+                        <button
+                            onClick={() => document.getElementById("voterFileInput").click()}
+                            className="w-full px-4 py-2 bg-primary-dim text-white rounded-lg hover:bg-primary transition-colors flex items-center justify-center gap-2"
+                        >
+                            📂 Загрузить из файла
+                        </button>
+                    </div>
+
                 </div>
 
                 {/* 🔘 Submit Button по центру снизу */}

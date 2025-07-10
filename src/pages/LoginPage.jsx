@@ -377,7 +377,7 @@ export default function LoginPage() {
 
                         {/* Выводим результат identityCommitment */}
                         {identityCommitment && (
-                            <p className="text-white mt-2">
+                            <p className="text-white break-all mt-2">
                                 Commitment: {identityCommitment}
                             </p>
                         )}
