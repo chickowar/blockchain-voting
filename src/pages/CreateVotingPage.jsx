@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { FaPlus, FaSpinner, FaTrash, FaCheck } from "react-icons/fa";
 import Modal from "../components/Modal.jsx";
+import { createVote } from "../components/VotingMethods.jsx";
+import { useAppContext } from "../components/AppContext.jsx";
 
 export default function CreateVotingPage() {
     const [candidates, setCandidates] = useState([]);
@@ -17,6 +19,10 @@ export default function CreateVotingPage() {
     const [loading, setLoading] = useState(false);
     const [resultMessage, setResultMessage] = useState("");
     const [errorMessages, setErrorMessages] = useState([]);
+
+    const {
+        votingContract
+    } = useAppContext()
 
     // ➕ Добавление кандидата
     const handleAddCandidate = () => {
@@ -116,34 +122,33 @@ export default function CreateVotingPage() {
     };
 
     // 📤 Финальное создание голосования
-    const handleCreateVoting = () => {
+    const handleCreateVoting = async () => {
         setLoading(true);
         setResultMessage("");
         setErrorMessages([]);
 
-        setTimeout(() => {
-            const errors = validateVotingData();
+        const errors = validateVotingData();
 
-            if (errors.length > 0) {
-                setErrorMessages(errors);
-                setResultMessage("");
-            } else {
-                const targetDate = new Date(endDateTime);
-                const now = new Date();
-                const endsInSeconds = Math.max(Math.floor((targetDate - now) / 1000), 0);
+        if (errors.length > 0) {
+            setErrorMessages(errors);
+            setResultMessage("");
+        } else {
+            const targetDate = new Date(endDateTime);
+            const now = new Date();
+            const endsInSeconds = Math.max(Math.floor((targetDate - now) / 1000), 0);
+            await createVote(votingTitle, candidates.length, voters, endsInSeconds, votingContract);
 
-                console.log("Создано голосование:", {
-                    title: votingTitle,
-                    candidates,
-                    voters,
-                    endsInSeconds,
-                });
+            console.log("Создано голосование:", {
+                title: votingTitle,
+                candidates,
+                voters,
+                endsInSeconds,
+            });
 
-                setResultMessage(`Голосование "${votingTitle}" создано!`);
-            }
+            setResultMessage(`Голосование "${votingTitle}" создано!`);
+        }
 
-            setLoading(false);
-        }, 500);
+        setLoading(false);
     };
 
     return (

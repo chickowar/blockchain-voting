@@ -71,7 +71,7 @@ async function castVote(voteIdString, option, votingContract) {
     // 2.2) Получаем список коммитментов из контракта
     const rawCommitments = await votingContract.getCommitments(voteId);
     // rawCommitments — Array<bytes32> → BigInt-массив:
-    const commitments = rawCommitments.map(x => BigInt(String(x)));
+    const commitments = rawCommitments.map(x => BigInt(x));
 
     // 2.3) Собираем Merkle-группу
     const group = new Group(commitments);
