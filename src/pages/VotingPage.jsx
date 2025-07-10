@@ -36,7 +36,7 @@ export default function VotingPage() {
                                     onClick={() => toggleCandidate(name)}
                                     className={`p-2 rounded-lg shadow cursor-pointer transition-colors ${isSelected ? 
                                         "text-white bg-primary hover:bg-primary-dim" : 
-                                        "bg-white hover:bg-gray-500 text-primary hover:text-primary-light"}`}
+                                        "bg-white hover:bg-gray-200 text-primary hover:text-primary-light"}`}
                                 >
                                     {name}
                                 </li>

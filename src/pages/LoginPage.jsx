@@ -217,7 +217,7 @@ export default function LoginPage() {
                         />
                         <button
                             type="submit"
-                            className="flex justify-center grow p-3 bg-primary text-white rounded-lg hover:bg-primary-light focus:outline-none focus:ring-2 focus:ring-primary"
+                            className="flex justify-center p-3 bg-primary text-white rounded-lg hover:bg-primary-light focus:outline-none focus:ring-2 focus:ring-primary"
                         >
                             <FaArrowRight/>
                         </button>

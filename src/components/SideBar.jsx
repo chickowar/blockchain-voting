@@ -4,12 +4,17 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import Modal from "./Modal.jsx";
 
-function SideBarIcon({onClick, icon}){
-    return <div className="flex items-center w-full h-24 my-6">
-        <div className="sidebar-icon" onClick={onClick}>
-            {icon({className: "w-2/3 h-2/3"})}
+function SideBarIcon({onClick, icon, title=null}){
+    return <>
+        <div className="flex items-center w-full h-24 my-6 overflow-x-visible">
+            <div className="sidebar-icon" onClick={onClick}>
+                {icon({className: "w-2/3 h-2/3"})}
+                {title ? <div className="tooltip">{title}</div> : null}
+            </div>
+
         </div>
-    </div>
+
+    </>;
 }
 
 export default function SideBar() {
@@ -35,16 +40,26 @@ export default function SideBar() {
 
     return (
         <>
-            <div className="flex flex-col justify-evenly
+            <div className="flex flex-col justify-evenly items-center
         top-0 left-0
-        h-screen w-1/12 m-0
-        shadow-lg bg-background-light overflow-clip"
+        h-screen w-23 max-w-23 min-w-23 m-0
+        shadow-lg bg-background-light"
             >
-                <SideBarIcon icon={FaPlus} onClick={() => navigate('/create')}/>
+                <SideBarIcon icon={FaPlus}
+                             onClick={() => navigate('/create')}
+                             title={'Добавить голосование'}
 
-                <SideBarIcon icon={FaUser} onClick={() => navigate('/login')}/>
+                />
 
-                <SideBarIcon icon={FaVoteYea} onClick={() => setIsModalOpen(true)}/>
+                <SideBarIcon icon={FaUser}
+                             onClick={() => navigate('/login')}
+                             title={'Авторизация'}
+                />
+
+                <SideBarIcon icon={FaVoteYea}
+                             onClick={() => setIsModalOpen(true)}
+                             title={'Участвовать в голосовании'}
+                />
 
                 {/* Modal для ввода ключа */}
                 <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
