@@ -12,18 +12,15 @@ export async function loadIdentity(voteIdString, signer) {
 
 export async function getIdentityCommitment(voteIdString, setIdentityCommitment, signer) {
     const identity = await loadIdentity(voteIdString, signer);
-    const identityCommitment = identity.commitment;  // это BigInt
+    const identityCommitment = BigInt(identity.commitment);  // это BigInt
     console.log("Identity Commitment:", identityCommitment);
 
     // Преобразуем BigInt в строку в шестнадцатеричной форме
-    const identityCommitmentHex = identityCommitment.toString(16);
+    const identityCommitmentHex = ethers.toBeHex(identityCommitment, 32);
 
-    // Дополняем строку до 32 байт
-    const identityCommitmentBytes32 = ethers.zeroPadValue(
-        "0x" + identityCommitmentHex, 32
-    );
+    console.log("Idenity Commitment Hex:", identityCommitmentHex);
 
-    setIdentityCommitment(identityCommitmentBytes32);
+    setIdentityCommitment(identityCommitmentHex);
 }
 
 export async function createVote(
@@ -70,8 +67,10 @@ async function castVote(voteIdString, option, votingContract) {
 
     // 2.2) Получаем список коммитментов из контракта
     const rawCommitments = await votingContract.getCommitments(voteId);
+    console.log("rawCommitments received from contract:", rawCommitments);
     // rawCommitments — Array<bytes32> → BigInt-массив:
     const commitments = rawCommitments.map(x => BigInt(String(x)));
+    console.log("commitments received from contract:", commitments);
 
     // 2.3) Собираем Merkle-группу
     const group = new Group(commitments);
