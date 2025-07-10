@@ -4,7 +4,7 @@ import { ethers } from "ethers";
 import { useAppContext } from "../components/AppContext.jsx";
 import { getIdentityCommitment } from "../components/VotingMethods.jsx";
 
-const VOTING_ADDRESS = "0x401aA868C85601F8Cba6bd0bFa8C227AC2cF4AC9";
+const VOTING_ADDRESS = "0x988B2E8D3108921ee3416cA50Ed1d94984E25951";
 const VOTING_ABI = [
     {
         "inputs": [

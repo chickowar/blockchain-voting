@@ -283,3 +283,90 @@ export default function LoginPage() {
         setIdentityCommitment("");
         setStatus("");
     }
+
+
+    return (
+        <div className="flex items-center justify-center min-h-screen">
+            <div className="flex flex-col items-center space-y-6 p-8 bg-secondary rounded-xl shadow-lg w-[50ch]">
+                <FaUser size={120} className="text-primary" />
+
+                {account ? (
+                    <>
+                        <p className="text-lg text-white">
+                            👛 <span className="text-primary">{account}</span>
+                        </p>
+                        <p className="text-white">💰 Баланс: {balance} ETH</p>
+
+                        {/* Поле для ввода voteIdString */}
+                        <div className="mt-4">
+                            <input
+                                type="text"
+                                placeholder="Введите voteIdString"
+                                value={voteIdString}
+                                onChange={(e) => setVoteIdString(e.target.value)}
+                                className="px-4 py-2 border border-primary rounded-lg"
+                            />
+                            <button
+                                onClick={() => {
+                                    if (!signer) {
+                                        setStatus("❌ Подключите MetaMask");
+                                        return;
+                                    }
+                                    getIdentityCommitment(
+                                        voteIdString,
+                                        (commitment) => {
+                                            setIdentityCommitment(commitment);
+                                            localStorage.setItem("identityCommitment", commitment);
+                                        },
+                                        signer
+                                    );
+                                }}
+                                className="ml-2 px-4 py-2 bg-primary text-white rounded-lg"
+                            >
+                                Получить Identity Commitment
+                            </button>
+                        </div>
+
+                        {/* Выводим результат identityCommitment */}
+                        {identityCommitment && (
+                            <p className="text-white mt-2">
+                                Commitment: {identityCommitment}
+                            </p>
+                        )}
+
+                        <button
+                            onClick={logout}
+                            className="mt-4 flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-light"
+                        >
+                            <FaSignOutAlt className="mr-2" />
+                            Выйти
+                        </button>
+                    </>
+                ) : (
+                    <form
+                        className="flex w-full max-w-sm space-x-2"
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            connectMetaMask();
+                        }}
+                    >
+                        <input
+                            type="text"
+                            placeholder="Подключите MetaMask"
+                            className="flex-grow px-4 py-2 border border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                            disabled
+                        />
+                        <button
+                            type="submit"
+                            className="p-3 bg-primary text-white rounded-lg hover:bg-primary-light focus:outline-none focus:ring-2 focus:ring-primary"
+                        >
+                            <FaArrowRight />
+                        </button>
+                    </form>
+                )}
+
+                {status && <p className="text-white">{status}</p>}
+            </div>
+        </div>
+    );
+}

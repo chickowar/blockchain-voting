@@ -71,6 +71,7 @@ export async function createVote(
 }
 
 export async function castVote(voteIdString, option, signer, votingContract) {
+    console.log("Voting contract: ", votingContract);
     const voteId = ethers.encodeBytes32String(voteIdString);
 
     // 2.1) Получаем Merkle-root, конец и число опций
@@ -111,19 +112,26 @@ export async function castVote(voteIdString, option, signer, votingContract) {
         externalNullifier  // nullifier scope
     );
 
-    const nullifierHash = BigInt(proof.nullifier);
+    const nullifierHash = BigInt(String(proof.nullifier));
+    console.log("nullifierHash: ", String(proof.nullifier));
     const solidityProof = packToSolidityProof(proof);
+    console.log("solidityProof: ", solidityProof);
+    console.log("option: ", option);
 
     // вот здесь вызываем:
-    const tx = await votingContract.vote(
-        voteId,
-        nullifierHash,
-        option,
-        solidityProof
-    );
-    console.log("castVote tx:", tx.hash);
-    await tx.wait();
-    console.log("✅ Vote cast");
+    try {
+        await votingContract.vote(
+            voteId,
+            nullifierHash,
+            option,
+            solidityProof,
+        );
+    } catch (e) {
+        console.error("🧨 Static call failed:", e);
+    }
+    // console.log("castVote tx:", tx.hash);
+    // await tx.wait();
+    // console.log("✅ Vote cast");
 }
 
 export async function getResults(voteIdString, votingContract) {

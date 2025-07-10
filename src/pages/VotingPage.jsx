@@ -67,6 +67,8 @@ export default function VotingPage() {
         // Всё ок, теперь вызываем castVote
         console.log("🚀 Conditions OK, calling castVote()");
         try {
+            console.log("Preview voting contract address:", votingContract);
+            console.log("id:", id);
             await castVote(id, parsedOption, signer, votingContract);
             console.log("✅ castVote succeeded");
             setStatusMessage("Голос отправлен!");
