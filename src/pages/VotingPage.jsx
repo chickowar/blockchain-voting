@@ -1,10 +1,12 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { FaCheck } from "react-icons/fa";
-import Modal from "../components/Modal";
 import { castVote, getResults } from "../components/VotingMethods";
 import { useAppContext } from "../components/AppContext";
 import { ethers } from "ethers";
+
+// const fakeRes = [0,1,2,3,4,3,2,1,0,1,1,1,1];
+// const fakeMaxCnt = 4;
 
 export default function VotingPage() {
     const { id } = useParams();
@@ -96,43 +98,80 @@ export default function VotingPage() {
         }
     };
 
+    const [maxCount, setMaxCount] = useState(0);
+
+    useEffect(()=>{
+        setMaxCount(Math.max(...results));
+    }, [results])
+
 
     return (
         <div className="flex justify-evenly items-stretch h-screen">
             {/* Левый блок — ввод опции */}
             <div className="flex-1 m-20 bg-secondary rounded-xl shadow-lg flex flex-col">
-                <h2 className="text-2xl text-center font-bold my-5">Введите номер опции</h2>
-                <div className="flex-1 px-6 flex flex-col items-center justify-center">
-                    <input
-                        type="number"
-                        value={voteNumber}
-                        onChange={e => setVoteNumber(e.target.value)}
-                        placeholder="Например, 1"
-                        className="w-40 p-2 border rounded text-center text-lg"
-                    />
-                    {error && <p className="text-red-500 mt-2">{error}</p>}
-                    {statusMessage && <p className="text-green-500 mt-2">{statusMessage}</p>}
+                <h2 className="text-2xl text-center font-bold my-5">Выберите опцию</h2>
+                <div className="flex-1 px-6 flex flex-col items-center justify-center w-full">
+                    <div className="w-full max-h-96 overflow-y-auto bg-secondary rounded-lg p-2 space-y-2">
+                        {results.map((_, index) => (
+                            <div
+                                key={index}
+                                onClick={() => setVoteNumber(index.toString())}
+                                className={`cursor-pointer rounded-lg px-4 py-3 shadow 
+                        ${
+                                    voteNumber === index.toString()
+                                        ? "bg-primary text-white"
+                                        : "bg-secondary-light hover:bg-primary-dim"
+                                } transition-colors duration-200`}
+                            >
+                                <p className="text-lg font-bold">Опция {index}</p>
+                            </div>
+                        ))}
+                    </div>
                 </div>
-                <div className="flex justify-end items-center bg-tetriary p-4 rounded-b-xl">
+
+                <div className="flex justify-between items-center bg-tetriary p-4 rounded-b-xl">
+                    {/* Error / Status Message */}
+                    <div className="flex-shrink-0 w-0 flex-1 mr-4 overflow-hidden">
+                        <p className="text-red-500 text-sm break-words">
+                            {error || statusMessage}
+                        </p>
+                    </div>
+
+                    {/* Submit Button */}
                     <button
                         onClick={handleVoteSubmit}
-                        className="w-12 h-12 flex items-center justify-center bg-primary text-white rounded-lg hover:bg-primary-light transition-colors"
+                        disabled={voteNumber === ""}
+                        className="w-12 h-12 flex items-center justify-center
+                        bg-primary text-white rounded-lg hover:bg-primary-light transition-all
+                        disabled:opacity-50 disabled:text-gray-400"
                     >
                         <FaCheck size={20} />
                     </button>
                 </div>
+
+
             </div>
 
             {/* Правый блок — вывод результатов */}
             <div className="flex-1 m-20 bg-secondary rounded-xl shadow-lg flex flex-col items-center text-center">
                 <h2 className="text-2xl font-bold my-5">Результаты</h2>
-                <div className="grow space-y-2 flex flex-col justify-center items-center">
+                <div className="grow space-y-2 flex w-full p-6 flex-col my-auto items-stretch overflow-y-auto rounded-b-xl bg-secondary-light">
                     {results.map((count, index) => (
+                    // {fakeRes.map((count, index) => (
                         <div
                             key={index}
-                            className="bg-white text-primary rounded-lg px-4 py-2 shadow text-lg"
+                            className="relative flex justify-between bg-primary-dim rounded-lg px-4 py-2 shadow-lg"
                         >
-                            Опция {index}: {count} голос{count === 1 ? "" : "ов"}
+                            {/* Fill */}
+                            <div
+                                className="absolute inset-0 bg-primary opacity-80 rounded-lg "
+                                style={{ width: `${(count / maxCount) * 100}%` }}
+                                // style={{width: `${count/fakeMaxCnt * 100}%`}}
+                            ></div>
+
+                            {/* Content */}
+                            <p className="relative z-10 text-left text-lg font-semibold text-gray-200">Опция {index}</p>
+                            <p className="relative z-10 text-right text-gray-700">{count}</p>
                         </div>
                     ))}
                 </div>
