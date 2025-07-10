@@ -2,7 +2,7 @@
 
 import SideBar from "./components/SideBar.jsx";
 import { AppProvider } from "./components/AppContext.jsx";
-import {BrowserRouter, Route, Router, Routes} from "react-router-dom";
+import {BrowserRouter, Route, Routes} from "react-router-dom";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import VotingPage from "./pages/VotingPage.jsx";
@@ -28,14 +28,15 @@ function BlankPage({body}) {
 }
 
 function App() {
-
     return (
         <AppProvider>
             <BrowserRouter>
                 <Routes>
                     <Route
                         path="/"
-                        element={<BlankPage body={<span>Main</span>}/>}
+                        element={<BlankPage body={<span>
+                            Main
+                        </span>}/>}
                     />
 
                     <Route

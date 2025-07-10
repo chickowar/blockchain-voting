@@ -4,12 +4,18 @@
 
 .sidebar-icon {
     @apply relative flex justify-center items-center
-        w-20 h-20
+
+
         mx-auto
         shadow-lg
+
+        w-20 h-20
+
         bg-primary
-        rounded-[40px]
+        rounded-[50%]
+
         transition-all duration-250 ease-in-out
+
         hover:bg-primary-light
         hover:rounded-2xl
         hover:w-[calc(var(--spacing)*22)]

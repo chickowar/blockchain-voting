@@ -141,10 +141,11 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="flex items-center justify-center min-h-screen">
-            <div className="flex flex-col items-center space-y-6 p-8 bg-secondary rounded-xl shadow-lg w-[50ch]">
-                <FaUser size={120} className="text-primary" />
-
+        <div className="flex items-center justify-center text-center min-h-screen">
+            <div className="flex flex-col items-stretch space-y-4 p-8 bg-secondary rounded-xl shadow-lg w-[60ch]">
+                <div className='flex justify-center'>
+                    <FaUser size={120} className="text-primary" />
+                </div>
                 {account ? (
                     <>
                         <p className="text-lg text-white">
@@ -153,35 +154,45 @@ export default function LoginPage() {
                         <p className="text-white">💰 Баланс: {balance} ETH</p>
                         <p className="text-white">📟 Счётчик: {counter}</p>
 
+                        <div className="flex justify-center">
+                            <button
+                                onClick={logout}
+                                className="flex items-center mt-4 mb-8 px-4 py-2 bg-primary-dim text-white rounded-lg hover:bg-primary"
+                            >
+                                <FaSignOutAlt className="mr-2" />
+                                Выйти
+                            </button>
+                        </div>
                         <div className="flex space-x-2">
                             <button
                                 onClick={incrementCounter}
-                                className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-light"
+                                className="flex grow items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-light"
                             >
                                 <FaPlus className="mr-2" /> Увеличить
                             </button>
                             <button
                                 onClick={() => setCounterValue(42)}
-                                className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-light"
+                                className="flex grow items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-light"
                             >
                                 Установить 42
                             </button>
                         </div>
 
                         {/* Поле для ввода voteIdString */}
-                        <div className="mt-4">
+                        <div className="flex mb-8">
                             <input
                                 type="text"
                                 placeholder="Введите voteIdString"
                                 value={voteIdString}
                                 onChange={(e) => setVoteIdString(e.target.value)}
-                                className="px-4 py-2 border border-primary rounded-lg"
+                                className="px-4 py-2 border border-primary rounded-lg grow"
                             />
                             <button
                                 onClick={() => getIdentityCommitment(voteIdString, setIdentityCommitment, signer)}
                                 className="ml-2 px-4 py-2 bg-primary text-white rounded-lg"
+                                title="Получить Identity Commitment"
                             >
-                                Получить Identity Commitment
+                                Get I.C.
                             </button>
                         </div>
 
@@ -189,18 +200,10 @@ export default function LoginPage() {
                         {identityCommitment && (
                             <p className="text-white mt-2">Commitment: {identityCommitment}</p>
                         )}
-
-                        <button
-                            onClick={logout}
-                            className="mt-4 flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-light"
-                        >
-                            <FaSignOutAlt className="mr-2" />
-                            Выйти
-                        </button>
                     </>
                 ) : (
                     <form
-                        className="flex w-full max-w-sm space-x-2"
+                        className="flex flex-grow justify-stretch w-full space-x-2"
                         onSubmit={(e) => {
                             e.preventDefault();
                             connectMetaMask();
@@ -209,19 +212,19 @@ export default function LoginPage() {
                         <input
                             type="text"
                             placeholder="Подключите MetaMask"
-                            className="flex-grow px-4 py-2 border border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                            className="grow px-4 py-2 border border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                             disabled
                         />
                         <button
                             type="submit"
-                            className="p-3 bg-primary text-white rounded-lg hover:bg-primary-light focus:outline-none focus:ring-2 focus:ring-primary"
+                            className="flex justify-center grow p-3 bg-primary text-white rounded-lg hover:bg-primary-light focus:outline-none focus:ring-2 focus:ring-primary"
                         >
-                            <FaArrowRight />
+                            <FaArrowRight/>
                         </button>
                     </form>
                 )}
 
-                {status && <p className="text-white">{status}</p>}
+                {status && <div className='text-wrap break-all'><p className="text-white">{status}</p></div>}
             </div>
         </div>
     );
