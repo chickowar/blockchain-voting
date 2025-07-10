@@ -1,25 +1,21 @@
 import { FaTimes } from "react-icons/fa";
 
 export default function Modal({ isOpen, onClose, children }) {
-
-    // Не уверен, что это лучшее решение, всё таки никак не юзается backdrop функционал,
-    // а также тут возвращается null, что делает сложным/невозможным анимирование появления
-    //  исчезновения. Крч, надо будет поправить нврн.
-
-    if (!isOpen) return null;
-
+    const duration = '100'
     return (
         <div
-            className="fixed inset-0  flex items-center justify-center z-50"
-            style={{backgroundColor: "rgba(0,0,0,0.6)"}}
-            onClick={onClose} // Закрытие по клику на фон
+            className={`fixed inset-0 z-50 flex items-center justify-center
+            transition-colors duration-${duration} ease-in-out
+            ${isOpen ? "bg-black/60 pointer-events-auto" : "bg-black/0 pointer-events-none"}`}
+            onClick={isOpen ? onClose : undefined}
         >
-            <dialog
-                open
-                className="relative bg-white rounded-lg shadow-xl p-6 max-w-[60ch] w-full"
-                onClick={(e) => e.stopPropagation()} // Предотвратить закрытие при клике внутри
+            <div
+                className={`relative bg-white rounded-lg shadow-xl p-6 max-w-[60ch] w-full
+                transform transition-all duration-${duration} ease-in-out
+                ${isOpen ? "scale-100 opacity-100" : "scale-80 opacity-0"}`}
+                onClick={(e) => e.stopPropagation()} // prevent backdrop click closing
             >
-                {/* Кнопка закрытия */}
+                {/* Close Button */}
                 <button
                     onClick={onClose}
                     className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
@@ -27,9 +23,9 @@ export default function Modal({ isOpen, onClose, children }) {
                     <FaTimes size={20} />
                 </button>
 
-                {/* Контент */}
-                <div>{children}</div>
-            </dialog>
+                {/* Modal Content */}
+                <div className="text-black">{children}</div>
+            </div>
         </div>
     );
 }
