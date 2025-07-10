@@ -4,7 +4,7 @@ import { ethers } from "ethers";
 import { useAppContext } from "../components/AppContext.jsx";
 import { getIdentityCommitment } from "../components/VotingMethods.jsx";
 
-const VOTING_ADDRESS = "0xd4EAe144036aeDF0142974677DAFa0f9c304751F";
+const VOTING_ADDRESS = "0xEf00Ff4B51FF253E4f83C20b466ca708360BDe11";
 const VOTING_ABI = [
     {
         "inputs": [
@@ -160,62 +160,6 @@ const VOTING_ABI = [
                 "internalType": "uint256",
                 "name": "",
                 "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "bytes32",
-                "name": "voteId",
-                "type": "bytes32"
-            },
-            {
-                "components": [
-                    {
-                        "internalType": "uint256",
-                        "name": "merkleTreeDepth",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "merkleTreeRoot",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "nullifier",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "message",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "scope",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256[8]",
-                        "name": "points",
-                        "type": "uint256[8]"
-                    }
-                ],
-                "internalType": "struct ISemaphore.SemaphoreProof",
-                "name": "proof",
-                "type": "tuple"
-            }
-        ],
-        "name": "isValidProof",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
             }
         ],
         "stateMutability": "view",

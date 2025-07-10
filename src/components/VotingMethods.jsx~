@@ -118,26 +118,14 @@ export async function castVote(voteIdString, option, signer, votingContract) {
 
     // вот здесь вызываем:
     console.log("Calling isValidProof")
-
-    const valid = await votingContract.isValidProof(
+    const tx = await votingContract.vote(
         voteId,
+        option,
         proof,
     );
-    console.log("isValidProof: ", valid);
-
-    if(valid) {
-        const tx = await votingContract.vote(
-            voteId,
-            option,
-            proof,
-        );
-        console.log("castVote tx:", tx.hash);
-        await tx.wait();
-        console.log("✅ Vote cast");
-    } else {
-        console.log("Invalid proof");
-        throw new Error("Invalid proof");
-    }
+    console.log("castVote tx:", tx.hash);
+    await tx.wait();
+    console.log("✅ Vote cast");
 }
 
 export async function getResults(voteIdString, votingContract) {
