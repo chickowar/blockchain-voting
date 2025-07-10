@@ -131,15 +131,20 @@ export default function CreateVotingPage() {
 
         if (errors.length > 0) {
             setErrorMessages(errors);
-            setResultMessage("");
-        } else {
+            setLoading(false); // 🩹 убрать лоадер даже при валидации
+            return;
+        }
+
+        try {
             const targetDate = new Date(endDateTime);
             const now = new Date();
             const endsInSeconds = Math.max(Math.floor((targetDate - now) / 1000), 0);
+
             console.log("Voting Contract: ", votingContract);
+
             await createVote(votingTitle, candidates.length, voters, endsInSeconds, votingContract);
 
-            console.log("Создано голосование:", {
+            console.log("✅ Создано голосование:", {
                 title: votingTitle,
                 candidates,
                 voters,
@@ -147,10 +152,19 @@ export default function CreateVotingPage() {
             });
 
             setResultMessage(`Голосование "${votingTitle}" создано!`);
-        }
+        } catch (error) {
+            console.error("❌ Ошибка при создании голосования:", error);
 
-        setLoading(false);
+            // 👇 Добавляем текст ошибки для пользователя
+            setErrorMessages([
+                "Не удалось создать голосование. Проверьте данные и попробуйте снова.",
+                `Техническая ошибка: ${error.message || error.toString()}`
+            ]);
+        } finally {
+            setLoading(false);
+        }
     };
+
 
     return (
         <>
@@ -364,7 +378,7 @@ export default function CreateVotingPage() {
 
                 {/* Ошибки */}
                 {errorMessages.length > 0 && (
-                    <div className="mb-4 text-red-600">
+                    <div className="mb-4 break-all overflow-y-auto max-h-[20ch] bg-gray-100 rounded-md px-3 text-red-600">
                         {errorMessages.map((err, i) => (
                             <p key={i}>• {err}</p>
                         ))}
