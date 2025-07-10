@@ -75,14 +75,14 @@ export async function castVote(voteIdString, option, signer, votingContract) {
     const voteId = ethers.encodeBytes32String(voteIdString);
 
     // 2.1) Получаем Merkle-root, конец и число опций
-    const [merkleRoot, votingEnd, optionsCount] =
-        await votingContract.getGroup(voteId);
-
-    console.log("merkleRoot: ", merkleRoot);
-    console.log("votingEnd: ", votingEnd);
-    console.log("optionsCount: ", optionsCount);
-
-    if (option >= optionsCount) throw new Error("Bad option");
+    // const [merkleRoot, votingEnd, optionsCount] =
+    //     await votingContract.getGroup(voteId);
+    //
+    // console.log("merkleRoot: ", merkleRoot);
+    // console.log("votingEnd: ", votingEnd);
+    // console.log("optionsCount: ", optionsCount);
+    //
+    // if (option >= optionsCount) throw new Error("Bad option");
 
     // 2.2) Получаем список коммитментов из контракта
     const rawCommitments = await votingContract.getCommitments(voteId);

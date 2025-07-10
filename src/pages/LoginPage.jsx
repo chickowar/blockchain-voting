@@ -1,50 +1,252 @@
-import { useState } from "react";
-import { FaArrowRight, FaUser, FaPlus, FaSignOutAlt } from "react-icons/fa";
+import { useState, useEffect } from "react";
+import { FaArrowRight, FaUser, FaSignOutAlt } from "react-icons/fa";
 import { ethers } from "ethers";
-import {useAppContext} from "../components/AppContext.jsx";
-import {getIdentityCommitment} from "../components/VotingMethods.jsx";
+import { useAppContext } from "../components/AppContext.jsx";
+import { getIdentityCommitment } from "../components/VotingMethods.jsx";
 
-const CONTRACT_ADDRESS = "0x8b99025ec986f9d71c67EF936061C24d6B44e9E8";
-const CONTRACT_ABI = [
-    "function increment() public",
-    "function setCounter(uint256 _value) public",
-    "function getCounter() public view returns (uint256)",
-    "function counter() public view returns (uint256)"
-];
-
-const VOTING_ADDRESS = "0x9bf73F06b864Dd795dFF41619569d388A9f093f4";
+const VOTING_ADDRESS = "0xEf00Ff4B51FF253E4f83C20b466ca708360BDe11";
 const VOTING_ABI = [
-    "function createVote(bytes32 voteId, bytes32[] identityCommitments, uint256 optionsCount, uint256 votingEnd, bytes32 merkleRoot) nonpayable",
-    "constructor(address _verifier) nonpayable",
-    "function vote(bytes32 voteId, uint256 nullifierHash, uint256 option, uint256[8] proof) nonpayable",
-    "function getCommitments(bytes32 voteId) view returns (bytes32[])",
-    "function getGroup(bytes32 voteId) view returns (bytes32, uint256, uint256)",
-    "function getResults(bytes32 voteId) view returns (uint256[])",
-    "function verifier() view returns (address)"
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "semaphoreAddress",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "voteId",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "uint256",
+                "name": "nullifierHash",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "option",
+                "type": "uint256"
+            }
+        ],
+        "name": "checkVoteConditions",
+        "outputs": [
+            {
+                "internalType": "string",
+                "name": "",
+                "type": "string"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "voteId",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "identityCommitments",
+                "type": "uint256[]"
+            },
+            {
+                "internalType": "uint256",
+                "name": "optionsCount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "votingEnd",
+                "type": "uint256"
+            },
+            {
+                "internalType": "bytes32",
+                "name": "merkleRoot",
+                "type": "bytes32"
+            }
+        ],
+        "name": "createVote",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "voteId",
+                "type": "bytes32"
+            }
+        ],
+        "name": "getCommitments",
+        "outputs": [
+            {
+                "internalType": "uint256[]",
+                "name": "",
+                "type": "uint256[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "voteId",
+                "type": "bytes32"
+            }
+        ],
+        "name": "getGroup",
+        "outputs": [
+            {
+                "internalType": "bytes32",
+                "name": "merkleRoot",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "uint256",
+                "name": "votingEnd",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "optionsCount",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "voteId",
+                "type": "bytes32"
+            }
+        ],
+        "name": "getResults",
+        "outputs": [
+            {
+                "internalType": "uint256[]",
+                "name": "counts",
+                "type": "uint256[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "name": "groupOf",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "semaphore",
+        "outputs": [
+            {
+                "internalType": "contract ISemaphore",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "voteId",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "uint256",
+                "name": "option",
+                "type": "uint256"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "uint256",
+                        "name": "merkleTreeDepth",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "merkleTreeRoot",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "nullifier",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "message",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "scope",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256[8]",
+                        "name": "points",
+                        "type": "uint256[8]"
+                    }
+                ],
+                "internalType": "struct ISemaphore.SemaphoreProof",
+                "name": "proof",
+                "type": "tuple"
+            }
+        ],
+        "name": "vote",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    }
 ];
-
 
 export default function LoginPage() {
     const [account, setAccount] = useState(null);
     const [balance, setBalance] = useState(null);
     const [status, setStatus] = useState("");
-    const [counter, setCounter] = useState(null);
-    // const [signer, setSigner] = useState(null);
-    //
-    // const [provider, setProvider] = useState(null);
-    // const [contract, setContract] = useState(null);
-    //
-    // const [voteIdString, setVoteIdString] = useState(""); // добавляем состояние для voteIdString
+    const [identityCommitment, setIdentityCommitment] = useState("");
 
     const {
         signer, setSigner,
         provider, setProvider,
-        contract, setContract,
         setVotingContract,
         voteIdString, setVoteIdString,
-    } = useAppContext();  // Используем контекст
-
-    const [identityCommitment, setIdentityCommitment] = useState(""); // для вывода commit
+    } = useAppContext();
 
     // Подключение MetaMask
     async function connectMetaMask() {
@@ -65,17 +267,13 @@ export default function LoginPage() {
             const balanceEth = ethers.formatEther(balanceWei);
             setBalance(parseFloat(balanceEth).toFixed(4));
 
-            const signer = await _provider.getSigner();
-            setSigner(signer);
+            const newSigner = await _provider.getSigner();
+            setSigner(newSigner);
 
-            const _contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-            setContract(_contract);
-
-            const _votingContract = new ethers.Contract(VOTING_ADDRESS, VOTING_ABI, signer);
+            const _votingContract = new ethers.Contract(VOTING_ADDRESS, VOTING_ABI, newSigner);
             setVotingContract(_votingContract);
 
-            await fetchCounter(_contract, _provider);
-
+            setIdentityCommitment(""); // Сбросить старый
             setStatus("✅ MetaMask подключен");
         } catch (err) {
             console.error(err);
@@ -83,62 +281,55 @@ export default function LoginPage() {
         }
     }
 
-    // Получение текущего значения счетчика
-    async function fetchCounter(contractInstance, providerInstance) {
-        try {
-            const readContract = contractInstance || new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, providerInstance);
-            const currentValue = await readContract.getCounter();
-            setCounter(currentValue.toString());
-        } catch (err) {
-            console.error(err);
-            setStatus("❌ Ошибка получения счётчика");
-        }
-    }
+    // Слушаем смену аккаунта в MetaMask
+    useEffect(() => {
+        if (!window.ethereum) return;
 
-    // Вызов increment() (тратит газ)
-    async function incrementCounter() {
-        if (!contract) {
-            setStatus("❌ Контракт не инициализирован");
-            return;
-        }
-        try {
-            const tx = await contract.increment();
-            setStatus("⛽️ Транзакция отправлена: " + tx.hash);
-            await tx.wait();
-            setStatus("✅ Счётчик увеличен");
-            await fetchCounter(contract, provider);
-        } catch (err) {
-            console.error(err);
-            setStatus("❌ Ошибка increment: " + err.message);
-        }
-    }
+        const handleAccountsChanged = async (accounts) => {
+            if (accounts.length === 0) {
+                // Пользователь отключил MetaMask
+                logout();
+                setStatus("👋 Аккаунт отключён");
+                return;
+            }
 
-    // Вызов setCounter(_value) (тратит газ)
-    async function setCounterValue(value) {
-        if (!contract) {
-            setStatus("❌ Контракт не инициализирован");
-            return;
-        }
-        try {
-            const tx = await contract.setCounter(value);
-            setStatus("⛽️ Транзакция отправлена: " + tx.hash);
-            await tx.wait();
-            setStatus("✅ Счётчик установлен");
-            await fetchCounter(contract, provider);
-        } catch (err) {
-            console.error(err);
-            setStatus("❌ Ошибка setCounter: " + err.message);
-        }
-    }
+            const _provider = new ethers.BrowserProvider(window.ethereum);
+            setProvider(_provider);
+
+            const newSigner = await _provider.getSigner();
+            setSigner(newSigner);
+
+            const address = accounts[0];
+            setAccount(address);
+
+            const balanceWei = await _provider.getBalance(address);
+            const balanceEth = ethers.formatEther(balanceWei);
+            setBalance(parseFloat(balanceEth).toFixed(4));
+
+            const _votingContract = new ethers.Contract(VOTING_ADDRESS, VOTING_ABI, newSigner);
+            setVotingContract(_votingContract);
+
+            setIdentityCommitment(""); // Сбросить старый
+            setStatus("🔄 Аккаунт MetaMask обновлён");
+        };
+
+        window.ethereum.on("accountsChanged", handleAccountsChanged);
+
+        return () => {
+            window.ethereum.removeListener("accountsChanged", handleAccountsChanged);
+        };
+    }, []);
 
     function logout() {
         setAccount(null);
         setBalance(null);
-        setCounter(null);
         setProvider(null);
-        setContract(null);
+        setSigner(null);
+        setVotingContract(null);
+        setIdentityCommitment("");
         setStatus("");
     }
+
 
     return (
         <div className="flex items-center justify-center text-center min-h-screen">
@@ -152,31 +343,6 @@ export default function LoginPage() {
                             👛 <span className="text-primary">{account}</span>
                         </p>
                         <p className="text-white">💰 Баланс: {balance} ETH</p>
-                        <p className="text-white">📟 Счётчик: {counter}</p>
-
-                        <div className="flex justify-center">
-                            <button
-                                onClick={logout}
-                                className="flex items-center mt-4 mb-8 px-4 py-2 bg-primary-dim text-white rounded-lg hover:bg-primary"
-                            >
-                                <FaSignOutAlt className="mr-2" />
-                                Выйти
-                            </button>
-                        </div>
-                        <div className="flex space-x-2">
-                            <button
-                                onClick={incrementCounter}
-                                className="flex grow items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-light"
-                            >
-                                <FaPlus className="mr-2" /> Увеличить
-                            </button>
-                            <button
-                                onClick={() => setCounterValue(42)}
-                                className="flex grow items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-light"
-                            >
-                                Установить 42
-                            </button>
-                        </div>
 
                         {/* Поле для ввода voteIdString */}
                         <div className="flex mb-8">
@@ -188,7 +354,20 @@ export default function LoginPage() {
                                 className="px-4 py-2 border border-primary rounded-lg grow"
                             />
                             <button
-                                onClick={() => getIdentityCommitment(voteIdString, setIdentityCommitment, signer)}
+                                onClick={() => {
+                                    if (!signer) {
+                                        setStatus("❌ Подключите MetaMask");
+                                        return;
+                                    }
+                                    getIdentityCommitment(
+                                        voteIdString,
+                                        (commitment) => {
+                                            setIdentityCommitment(commitment);
+                                            localStorage.setItem("identityCommitment", commitment);
+                                        },
+                                        signer
+                                    );
+                                }}
                                 className="ml-2 px-4 py-2 bg-primary text-white rounded-lg"
                                 title="Получить Identity Commitment"
                             >
@@ -198,8 +377,20 @@ export default function LoginPage() {
 
                         {/* Выводим результат identityCommitment */}
                         {identityCommitment && (
-                            <p className="text-white mt-2">Commitment: {identityCommitment}</p>
+                            <p className="text-white mt-2">
+                                Commitment: {identityCommitment}
+                            </p>
                         )}
+
+                        <div className="flex justify-center">
+                            <button
+                                onClick={logout}
+                                className="flex items-center mt-4 mb-8 px-4 py-2 bg-primary-dim text-white rounded-lg hover:bg-primary"
+                            >
+                                <FaSignOutAlt className="mr-2" />
+                                Выйти
+                            </button>
+                        </div>
                     </>
                 ) : (
                     <form
