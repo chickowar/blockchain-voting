@@ -1,63 +1,106 @@
 import { useParams } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaCheck } from "react-icons/fa";
+import { castVote, getResults } from "../components/VotingMethods";
+import { useAppContext } from "../components/AppContext";
+import { ethers } from "ethers";
 
 export default function VotingPage() {
     const { id } = useParams();
+    const { votingContract, signer } = useAppContext();
 
-    const candidates = [
-        "Alice", "Bob", "Charlie", "Diana",
-        "Alice1", "Bob1", "Charlie1", "Diana1",
-        "Alice2", "Bob2", "Charlie2", "Diana2", "Alice3", "Bob3", "Charlie3", "Diana3",
-    ];
+    const [voteNumber, setVoteNumber]       = useState("");
+    const [results, setResults]             = useState([]);
+    const [error, setError]                 = useState(null);
+    const [statusMessage, setStatusMessage] = useState("");
 
-    const [selectedCandidates, setSelectedCandidates] = useState([]);
+    // 1) Загрузка и логирование результатов при монтировании
+    useEffect(() => {
+        const loadResults = async () => {
+            console.log("⏳ Loading results for vote:", id);
+            try {
+                const raw = await getResults(id, votingContract);
+                console.log("✅ Raw results from contract:", raw);
+                const nums = raw.map(r => Number(r));
+                console.log("🔢 Parsed results:", nums);
+                setResults(nums);
+            } catch (err) {
+                console.error("❌ Ошибка при загрузке результатов:", err);
+                setError("Не удалось загрузить результаты");
+            }
+        };
+        loadResults();
+    }, [id, votingContract]);
 
-    const toggleCandidate = (name) => {
-        setSelectedCandidates((prev) =>
-            prev.includes(name)
-                ? prev.filter((c) => c !== name) // убрать если выбран
-                : [...prev, name]               // добавить если не выбран
-        );
+    // 2) Отправка голоса с проверкой условий
+    const handleVoteSubmit = async () => {
+        setError(null);
+        setStatusMessage("");
+        const parsedOption = parseInt(voteNumber, 10);
+        if (isNaN(parsedOption)) {
+            setError("Введите корректный номер опции");
+            return;
+        }
+
+        // Кодирование voteId
+        const voteId = ethers.encodeBytes32String(id);
+
+        // Проверка перед голосованием
+        console.log("🔍 Checking vote conditions...");
+        try {
+            const check = await votingContract.checkVoteConditions(
+                voteId,
+                0, // nullifierHash placeholder, вызываем только for conditions before proof
+                parsedOption
+            );
+            console.log("✅ checkVoteConditions returned:", check);
+            if (check !== "OK") {
+                setError("Нельзя голосовать: " + check);
+                return;
+            }
+        } catch (e) {
+            console.error("❌ Ошибка при вызове checkVoteConditions:", e);
+            setError("Ошибка проверки условий: " + (e.reason || e.message));
+            return;
+        }
+
+        // Всё ок, теперь вызываем castVote
+        console.log("🚀 Conditions OK, calling castVote()");
+        try {
+            await castVote(id, parsedOption, signer, votingContract);
+            console.log("✅ castVote succeeded");
+            setStatusMessage("Голос отправлен!");
+            // Обновим результаты после голосования
+            const raw = await getResults(id, votingContract);
+            console.log("🔁 Raw results after vote:", raw);
+            const nums = raw.map(r => Number(r));
+            console.log("🔢 Parsed results after vote:", nums);
+            setResults(nums);
+        } catch (err) {
+            console.error("❌ Ошибка при голосовании:", err);
+            setError(err.message || "Произошла ошибка при голосовании");
+        }
     };
 
     return (
         <div className="flex justify-evenly items-stretch h-screen">
+            {/* Левый блок — ввод опции */}
             <div className="flex-1 m-20 bg-secondary rounded-xl shadow-lg flex flex-col">
-                {/* 🗳️ Candidates */}
-                <h2 className="text-2xl text-center font-bold mt-5 mb-4">Candidates</h2>
-                <div className="flex-1 px-6 overflow-y-auto">
-                    <ul className="space-y-2 mb-4">
-                        {candidates.map((name, index) => {
-                            const isSelected = selectedCandidates.includes(name);
-                            return (
-                                <li
-                                    key={index}
-                                    onClick={() => toggleCandidate(name)}
-                                    className={`p-2 rounded-lg shadow cursor-pointer transition-colors ${isSelected ? 
-                                        "text-white bg-primary hover:bg-primary-dim" : 
-                                        "bg-white hover:bg-gray-500 text-primary hover:text-primary-light"}`}
-                                >
-                                    {name}
-                                </li>
-                            );
-                        })}
-                    </ul>
+                <h2 className="text-2xl text-center font-bold mt-5 mb-4">Введите номер опции</h2>
+                <div className="flex-1 px-6 flex flex-col items-center justify-center">
+                    <input
+                        type="number"
+                        value={voteNumber}
+                        onChange={e => setVoteNumber(e.target.value)}
+                        placeholder="Например, 1"
+                        className="w-40 p-2 border rounded text-center text-lg"
+                    />
+                    {error && <p className="text-red-500 mt-2">{error}</p>}
+                    {statusMessage && <p className="text-green-500 mt-2">{statusMessage}</p>}
                 </div>
-
-                {/* 📦 Bottom block */}
-                <div className="flex justify-between items-center bg-tetriary p-4 rounded-b-xl">
-                    {/* Выбранные кандидаты */}
-                    <div className="text-sm text-gray-300 flex-1 mr-2 overflow-hidden">
-                        <p className="break-words whitespace-normal leading-snug max-h-[4.5rem] overflow-clip">
-                            {selectedCandidates.length > 0
-                                ? selectedCandidates.join(", ")
-                                : "Никого не выбрали"}
-                        </p>
-                    </div>
-
-                    {/* submit */}
+                <div className="flex justify-end items-center bg-tetriary p-4 rounded-b-xl">
                     <button
+                        onClick={handleVoteSubmit}
                         className="w-12 h-12 flex items-center justify-center bg-primary text-white rounded-lg hover:bg-primary-light transition-colors"
                     >
                         <FaCheck size={20} />
@@ -65,11 +108,19 @@ export default function VotingPage() {
                 </div>
             </div>
 
-            {/* 📄 RIGHT */}
-            <div className="flex-1 m-20 bg-secondary rounded-xl shadow-lg flex items-center justify-center text-center">
-        <span className="font-bold text-2xl">
-          Тут типа можно будет описания потом, либо убрать вообще
-        </span>
+            {/* Правый блок — вывод результатов */}
+            <div className="flex-1 m-20 bg-secondary rounded-xl shadow-lg flex flex-col items-center justify-center text-center">
+                <h2 className="text-2xl font-bold mb-4">Результаты</h2>
+                <div className="space-y-2">
+                    {results.map((count, index) => (
+                        <div
+                            key={index}
+                            className="bg-white text-primary rounded-lg px-4 py-2 shadow text-lg"
+                        >
+                            Опция {index}: {count} голос{count === 1 ? "" : "ов"}
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
     );

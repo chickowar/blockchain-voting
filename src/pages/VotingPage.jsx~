@@ -1,0 +1,91 @@
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { FaCheck } from "react-icons/fa";
+import { castVote, getResults } from "../components/VotingMethods";
+import { useAppContext } from "../components/AppContext";
+
+
+export default function VotingPage() {
+    const { id } = useParams();
+
+    const [voteNumber, setVoteNumber] = useState("");
+    const [results, setResults] = useState([]);
+    const [error, setError] = useState(null);
+
+    const {
+        votingContract,
+        signer,
+    } = useAppContext()
+
+    useEffect(() => {
+        const loadResults = async () => {
+            try {
+                const res = await getResults(id, votingContract);
+                setResults(res.map(r => Number(r))); // Преобразуем BigNumber в число
+            } catch (err) {
+                console.error("Ошибка при загрузке результатов:", err);
+            }
+        };
+        loadResults();
+    }, [id, votingContract]);
+
+    const handleVoteSubmit = async () => {
+        setError(null);
+        try {
+            const parsedOption = parseInt(voteNumber, 10);
+            if (isNaN(parsedOption)) {
+                setError("Введите номер опции");
+                return;
+            }
+
+            await castVote(id, parsedOption, signer, votingContract);
+            alert("✅ Голос отправлен!");
+
+        } catch (err) {
+            console.error("Ошибка при голосовании:", err);
+            setError(err.message || "Произошла ошибка");
+        }
+    };
+
+    return (
+        <div className="flex justify-evenly items-stretch h-screen">
+            <div className="flex-1 m-20 bg-secondary rounded-xl shadow-lg flex flex-col">
+                <h2 className="text-2xl text-center font-bold mt-5 mb-4">Введите номер опции</h2>
+
+                <div className="flex-1 px-6 flex flex-col items-center justify-center">
+                    <input
+                        type="number"
+                        value={voteNumber}
+                        onChange={(e) => setVoteNumber(e.target.value)}
+                        placeholder="Например, 1"
+                        className="w-40 p-2 border rounded text-center text-lg"
+                    />
+                    {error && <p className="text-red-500 mt-2">{error}</p>}
+                </div>
+
+                <div className="flex justify-end items-center bg-tetriary p-4 rounded-b-xl">
+                    <button
+                        onClick={handleVoteSubmit}
+                        className="w-12 h-12 flex items-center justify-center bg-primary text-white rounded-lg hover:bg-primary-light transition-colors"
+                    >
+                        <FaCheck size={20} />
+                    </button>
+                </div>
+            </div>
+
+            <div className="flex-1 m-20 bg-secondary rounded-xl shadow-lg flex flex-col items-center justify-center text-center">
+                <h2 className="text-2xl font-bold mb-4">Результаты</h2>
+                <div className="space-y-2">
+                    {results.map((count, index) => (
+                        <div
+                            key={index}
+                            className="bg-white text-primary rounded-lg px-4 py-2 shadow text-lg"
+                        >
+                            Опция {index}: {count} голосов
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+}

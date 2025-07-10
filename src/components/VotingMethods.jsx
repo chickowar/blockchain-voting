@@ -5,6 +5,16 @@ import {
     generateProof
 } from "@semaphore-protocol/proof";
 
+function packToSolidityProof(proof) {
+    // proof.points — массив из восьми координат [Ax, Ay, Bx0, Bx1, By0, By1, Cx, Cy]
+    const p = proof.points.map(x => BigInt(x));
+    return [
+        p[0], p[1],                  // A
+        p[2], p[3], p[4], p[5],      // B
+        p[6], p[7]                   // C
+    ];
+}
+
 export async function loadIdentity(voteIdString, signer) {
     const sig = await signer.signMessage(`Generate Semaphore identity for ${voteIdString}`);
     return new Identity(sig);
@@ -60,7 +70,7 @@ export async function createVote(
     console.log("✅ Vote created");
 }
 
-async function castVote(voteIdString, option, votingContract) {
+export async function castVote(voteIdString, option, signer, votingContract) {
     const voteId = ethers.encodeBytes32String(voteIdString);
 
     // 2.1) Получаем Merkle-root, конец и число опций
@@ -84,7 +94,7 @@ async function castVote(voteIdString, option, votingContract) {
     const group = new Group(commitments);
 
     // 2.4) Генерируем или восстанавливаем user’s Identity
-    const identity = await loadIdentity(voteIdString);
+    const identity = await loadIdentity(voteIdString, signer);
 
     // 2.5) External nullifier = hash(voteIdString)
     const externalNullifier = BigInt(
@@ -97,20 +107,28 @@ async function castVote(voteIdString, option, votingContract) {
     const proof = await generateProof(
         identity,
         group,
-        option,
-        externalNullifier,
+        option,            // signal
+        externalNullifier  // nullifier scope
     );
 
-    console.log("proof.nullifier: ", String(proof.nullifier));
+    const nullifierHash = BigInt(proof.nullifier);
+    const solidityProof = packToSolidityProof(proof);
 
-    // 2.7) Отправляем голос
+    // вот здесь вызываем:
     const tx = await votingContract.vote(
         voteId,
-        BigInt(String(proof.nullifier)),
+        nullifierHash,
         option,
-        proof.points.map(c => BigInt(String(c))),
+        solidityProof
     );
     console.log("castVote tx:", tx.hash);
     await tx.wait();
     console.log("✅ Vote cast");
+}
+
+export async function getResults(voteIdString, votingContract) {
+    const voteId = ethers.encodeBytes32String(voteIdString);
+    const results = await votingContract.getResults(voteId);
+    console.log("results: ", results);
+    return results;
 }
