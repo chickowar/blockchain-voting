@@ -136,6 +136,7 @@ export default function CreateVotingPage() {
             const targetDate = new Date(endDateTime);
             const now = new Date();
             const endsInSeconds = Math.max(Math.floor((targetDate - now) / 1000), 0);
+            console.log("Voting Contract: ", votingContract);
             await createVote(votingTitle, candidates.length, voters, endsInSeconds, votingContract);
 
             console.log("Создано голосование:", {

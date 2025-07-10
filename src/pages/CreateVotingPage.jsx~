@@ -2,6 +2,7 @@ import { useState } from "react";
 import { FaPlus, FaSpinner, FaTrash, FaCheck } from "react-icons/fa";
 import Modal from "../components/Modal.jsx";
 import { createVote } from "../components/VotingMethods.jsx";
+import { useAppContext } from "../components/AppContext.jsx";
 
 export default function CreateVotingPage() {
     const [candidates, setCandidates] = useState([]);
@@ -21,7 +22,7 @@ export default function CreateVotingPage() {
 
     const {
         votingContract
-    } 
+    } = useAppContext()
 
     // ➕ Добавление кандидата
     const handleAddCandidate = () => {

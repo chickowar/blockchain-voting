@@ -14,13 +14,158 @@ const CONTRACT_ABI = [
 
 const VOTING_ADDRESS = "0x9bf73F06b864Dd795dFF41619569d388A9f093f4";
 const VOTING_ABI = [
-    "function createVote(bytes32 voteId, bytes32[] identityCommitments, uint256 optionsCount, uint256 votingEnd, bytes32 merkleRoot) nonpayable",
-    "constructor(address _verifier) nonpayable",
-    "function vote(bytes32 voteId, uint256 nullifierHash, uint256 option, uint256[8] proof) nonpayable",
-    "function getCommitments(bytes32 voteId) view returns (bytes32[])",
-    "function getGroup(bytes32 voteId) view returns (bytes32, uint256, uint256)",
-    "function getResults(bytes32 voteId) view returns (uint256[])",
-    "function verifier() view returns (address)"
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "voteId",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "bytes32[]",
+                "name": "identityCommitments",
+                "type": "bytes32[]"
+            },
+            {
+                "internalType": "uint256",
+                "name": "optionsCount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "votingEnd",
+                "type": "uint256"
+            },
+            {
+                "internalType": "bytes32",
+                "name": "merkleRoot",
+                "type": "bytes32"
+            }
+        ],
+        "name": "createVote",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_verifier",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "voteId",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "uint256",
+                "name": "nullifierHash",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "option",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256[8]",
+                "name": "proof",
+                "type": "uint256[8]"
+            }
+        ],
+        "name": "vote",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "voteId",
+                "type": "bytes32"
+            }
+        ],
+        "name": "getCommitments",
+        "outputs": [
+            {
+                "internalType": "bytes32[]",
+                "name": "",
+                "type": "bytes32[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "voteId",
+                "type": "bytes32"
+            }
+        ],
+        "name": "getGroup",
+        "outputs": [
+            {
+                "internalType": "bytes32",
+                "name": "merkleRoot",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "uint256",
+                "name": "votingEnd",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "optionsCount",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "voteId",
+                "type": "bytes32"
+            }
+        ],
+        "name": "getResults",
+        "outputs": [
+            {
+                "internalType": "uint256[]",
+                "name": "",
+                "type": "uint256[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "verifier",
+        "outputs": [
+            {
+                "internalType": "contract ISemaphoreVerifier",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    }
 ];
 
 

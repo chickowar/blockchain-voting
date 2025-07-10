@@ -11,6 +11,7 @@ export async function loadIdentity(voteIdString, signer) {
 }
 
 export async function getIdentityCommitment(voteIdString, setIdentityCommitment, signer) {
+    console.log("VoteId bytes32:", ethers.encodeBytes32String(voteIdString));
     const identity = await loadIdentity(voteIdString, signer);
     const identityCommitment = BigInt(identity.commitment);  // это BigInt
     console.log("Identity Commitment:", identityCommitment);
@@ -30,22 +31,29 @@ export async function createVote(
     votingDurationSec,
     votingContract,
 ) {
+    console.log("typeof identityCommitments[0]:", typeof identityCommitments[0]);
+    console.log("identityCommitments[0]:", identityCommitments[0]);
     // 1. Собираем Merkle-группу
     const group = new Group(identityCommitments.map(c => BigInt(c)));
     const merkleRoot = BigInt(group.root);
+    const merkleRootBytes32 = ethers.zeroPadValue(ethers.toBeHex(merkleRoot), 32);
 
     // 2. Подготавливаем args
     const voteId    = ethers.encodeBytes32String(voteIdString);
     const nowSec    = Math.floor(Date.now() / 1000);
     const votingEnd = nowSec + votingDurationSec;
 
+    const identityCommitmentsBytes32 = identityCommitments.map((c) =>
+        ethers.zeroPadValue(c, 32) // ← это приведёт строку '0x...' к bytes32
+    );
+
     // 3. Транзакция
     const tx = await votingContract.createVote(
         voteId,
-        identityCommitments,
+        identityCommitmentsBytes32,
         optionsCount,
         votingEnd,
-        merkleRoot
+        merkleRootBytes32,
     );
     console.log("createVote tx:", tx.hash);
     await tx.wait();
