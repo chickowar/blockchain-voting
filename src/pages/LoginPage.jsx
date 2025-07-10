@@ -3,306 +3,44 @@ import { FaArrowRight, FaUser, FaSignOutAlt } from "react-icons/fa";
 import { ethers } from "ethers";
 import { useAppContext } from "../components/AppContext.jsx";
 import { getIdentityCommitment } from "../components/VotingMethods.jsx";
+import {getProviderSignerVotingContract, VOTING_ABI, VOTING_ADDRESS} from "../assets/voting_config.js";
 
-const VOTING_ADDRESS = "0xd4EAe144036aeDF0142974677DAFa0f9c304751F";
-const VOTING_ABI = [
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "semaphoreAddress",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "constructor"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "bytes32",
-                "name": "voteId",
-                "type": "bytes32"
-            },
-            {
-                "internalType": "uint256",
-                "name": "nullifierHash",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "option",
-                "type": "uint256"
-            }
-        ],
-        "name": "checkVoteConditions",
-        "outputs": [
-            {
-                "internalType": "string",
-                "name": "",
-                "type": "string"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "bytes32",
-                "name": "voteId",
-                "type": "bytes32"
-            },
-            {
-                "internalType": "uint256[]",
-                "name": "identityCommitments",
-                "type": "uint256[]"
-            },
-            {
-                "internalType": "uint256",
-                "name": "optionsCount",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "votingEnd",
-                "type": "uint256"
-            },
-            {
-                "internalType": "bytes32",
-                "name": "merkleRoot",
-                "type": "bytes32"
-            }
-        ],
-        "name": "createVote",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "bytes32",
-                "name": "voteId",
-                "type": "bytes32"
-            }
-        ],
-        "name": "getCommitments",
-        "outputs": [
-            {
-                "internalType": "uint256[]",
-                "name": "",
-                "type": "uint256[]"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "bytes32",
-                "name": "voteId",
-                "type": "bytes32"
-            }
-        ],
-        "name": "getGroup",
-        "outputs": [
-            {
-                "internalType": "bytes32",
-                "name": "merkleRoot",
-                "type": "bytes32"
-            },
-            {
-                "internalType": "uint256",
-                "name": "votingEnd",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "optionsCount",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "bytes32",
-                "name": "voteId",
-                "type": "bytes32"
-            }
-        ],
-        "name": "getResults",
-        "outputs": [
-            {
-                "internalType": "uint256[]",
-                "name": "counts",
-                "type": "uint256[]"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "bytes32",
-                "name": "",
-                "type": "bytes32"
-            }
-        ],
-        "name": "groupOf",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "bytes32",
-                "name": "voteId",
-                "type": "bytes32"
-            },
-            {
-                "components": [
-                    {
-                        "internalType": "uint256",
-                        "name": "merkleTreeDepth",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "merkleTreeRoot",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "nullifier",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "message",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "scope",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256[8]",
-                        "name": "points",
-                        "type": "uint256[8]"
-                    }
-                ],
-                "internalType": "struct ISemaphore.SemaphoreProof",
-                "name": "proof",
-                "type": "tuple"
-            }
-        ],
-        "name": "isValidProof",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "semaphore",
-        "outputs": [
-            {
-                "internalType": "contract ISemaphore",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "bytes32",
-                "name": "voteId",
-                "type": "bytes32"
-            },
-            {
-                "internalType": "uint256",
-                "name": "option",
-                "type": "uint256"
-            },
-            {
-                "components": [
-                    {
-                        "internalType": "uint256",
-                        "name": "merkleTreeDepth",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "merkleTreeRoot",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "nullifier",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "message",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "scope",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256[8]",
-                        "name": "points",
-                        "type": "uint256[8]"
-                    }
-                ],
-                "internalType": "struct ISemaphore.SemaphoreProof",
-                "name": "proof",
-                "type": "tuple"
-            }
-        ],
-        "name": "vote",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    }
-];
 
 export default function LoginPage() {
     const [account, setAccount] = useState(null);
     const [balance, setBalance] = useState(null);
     const [status, setStatus] = useState("");
-    const [identityCommitment, setIdentityCommitment] = useState("");
 
     const {
         signer, setSigner,
         provider, setProvider,
         setVotingContract,
         voteIdString, setVoteIdString,
+        identityCommitment, setIdentityCommitment,
     } = useAppContext();
+
+    useEffect(() => {
+        const restoreAccount = async () => {
+            if (localStorage.getItem("isConnected") === "true" && signer && provider) {
+                try {
+                    const address = await signer.getAddress();
+                    setAccount(address);
+
+                    const balanceWei = await provider.getBalance(address);
+                    const balanceEth = ethers.formatEther(balanceWei);
+                    setBalance(parseFloat(balanceEth).toFixed(4));
+
+                    setStatus("✅ Восстановлено из AppContext");
+                } catch (err) {
+                    console.error("❌ Ошибка при восстановлении аккаунта:", err);
+                    logout();
+                }
+            }
+        };
+
+        restoreAccount();
+    }, [signer, provider]);
+
 
     // Подключение MetaMask
     async function connectMetaMask() {
@@ -312,7 +50,9 @@ export default function LoginPage() {
         }
 
         try {
-            const _provider = new ethers.BrowserProvider(window.ethereum);
+            const providerSignerVotingContract = await getProviderSignerVotingContract();
+
+            const _provider = providerSignerVotingContract.provider;
             setProvider(_provider);
 
             const accounts = await _provider.send("eth_requestAccounts", []);
@@ -323,13 +63,17 @@ export default function LoginPage() {
             const balanceEth = ethers.formatEther(balanceWei);
             setBalance(parseFloat(balanceEth).toFixed(4));
 
-            const newSigner = await _provider.getSigner();
+            const newSigner = providerSignerVotingContract.signer;
             setSigner(newSigner);
 
-            const _votingContract = new ethers.Contract(VOTING_ADDRESS, VOTING_ABI, newSigner);
+            const _votingContract = providerSignerVotingContract.votingContract;
             setVotingContract(_votingContract);
 
             setIdentityCommitment(""); // Сбросить старый
+            setVoteIdString("");
+
+            localStorage.setItem("isConnected", "true");
+
             setStatus("✅ MetaMask подключен");
         } catch (err) {
             console.error(err);
@@ -349,10 +93,12 @@ export default function LoginPage() {
                 return;
             }
 
-            const _provider = new ethers.BrowserProvider(window.ethereum);
+            const providerSignerVotingContract = await getProviderSignerVotingContract();
+
+            const _provider = providerSignerVotingContract.provider;
             setProvider(_provider);
 
-            const newSigner = await _provider.getSigner();
+            const newSigner = providerSignerVotingContract.signer;
             setSigner(newSigner);
 
             const address = accounts[0];
@@ -362,10 +108,14 @@ export default function LoginPage() {
             const balanceEth = ethers.formatEther(balanceWei);
             setBalance(parseFloat(balanceEth).toFixed(4));
 
-            const _votingContract = new ethers.Contract(VOTING_ADDRESS, VOTING_ABI, newSigner);
+            const _votingContract = providerSignerVotingContract.votingContract;
             setVotingContract(_votingContract);
 
             setIdentityCommitment(""); // Сбросить старый
+            setVoteIdString("");
+
+
+            localStorage.setItem("isConnected", "true");
             setStatus("🔄 Аккаунт MetaMask обновлён");
         };
 
@@ -377,12 +127,14 @@ export default function LoginPage() {
     }, []);
 
     function logout() {
+        localStorage.setItem("isConnected", "false");
         setAccount(null);
         setBalance(null);
         setProvider(null);
         setSigner(null);
         setVotingContract(null);
         setIdentityCommitment("");
+        setVoteIdString("");
         setStatus("");
     }
 

@@ -141,6 +141,10 @@ export async function castVote(voteIdString, option, signer, votingContract) {
 }
 
 export async function getResults(voteIdString, votingContract) {
+    if (!votingContract || typeof votingContract.getResults !== "function") {
+        throw new Error(`votingContract isn't loaded`);
+    }
+
     const voteId = ethers.encodeBytes32String(voteIdString);
     const results = await votingContract.getResults(voteId);
     console.log("results: ", results);

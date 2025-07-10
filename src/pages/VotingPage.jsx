@@ -25,9 +25,16 @@ export default function VotingPage() {
                 const nums = raw.map(r => Number(r));
                 console.log("🔢 Parsed results:", nums);
                 setResults(nums);
+                setError("");
+
             } catch (err) {
                 console.error("❌ Ошибка при загрузке результатов:", err);
-                setError("Не удалось загрузить результаты");
+                if (err.message === `votingContract isn't loaded`){
+                    setError("Контракт не загружен, возможно ошибка исправится, если немного подождать");
+                } else {
+                    setError("Не удалось загрузить результаты");
+                }
+
             }
         };
         loadResults();
@@ -94,7 +101,7 @@ export default function VotingPage() {
         <div className="flex justify-evenly items-stretch h-screen">
             {/* Левый блок — ввод опции */}
             <div className="flex-1 m-20 bg-secondary rounded-xl shadow-lg flex flex-col">
-                <h2 className="text-2xl text-center font-bold mt-5 mb-4">Введите номер опции</h2>
+                <h2 className="text-2xl text-center font-bold my-5">Введите номер опции</h2>
                 <div className="flex-1 px-6 flex flex-col items-center justify-center">
                     <input
                         type="number"
@@ -117,9 +124,9 @@ export default function VotingPage() {
             </div>
 
             {/* Правый блок — вывод результатов */}
-            <div className="flex-1 m-20 bg-secondary rounded-xl shadow-lg flex flex-col items-center justify-center text-center">
-                <h2 className="text-2xl font-bold mb-4">Результаты</h2>
-                <div className="space-y-2">
+            <div className="flex-1 m-20 bg-secondary rounded-xl shadow-lg flex flex-col items-center text-center">
+                <h2 className="text-2xl font-bold my-5">Результаты</h2>
+                <div className="grow space-y-2 flex flex-col justify-center items-center">
                     {results.map((count, index) => (
                         <div
                             key={index}
@@ -131,19 +138,6 @@ export default function VotingPage() {
                 </div>
             </div>
 
-            {/*/!* 🌟 Modal *!/*/}
-            {/*<Modal isOpen={isModalOpen} onClose={handleCloseModal}>*/}
-            {/*    <h2 className="text-xl font-bold mb-4">Выбранные опции в голосовании {id}:</h2>*/}
-            {/*    {selectedCandidates.length > 0 ? (*/}
-            {/*        <ul className="list-decimal list-inside pl-5 space-y-1 flex-1 bg-gray-100 rounded-lg p-3 max-h-[30ch] overflow-y-auto">*/}
-            {/*            {selectedCandidates.map((name, idx) => (*/}
-            {/*                <li key={idx}>{name}</li>*/}
-            {/*            ))}*/}
-            {/*        </ul>*/}
-            {/*    ) : (*/}
-            {/*        <p className="text-gray-500">Никого не выбрали</p>*/}
-            {/*    )}*/}
-            {/*</Modal>*/}
         </div>
     );
 }
