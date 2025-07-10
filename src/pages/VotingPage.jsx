@@ -37,6 +37,7 @@ export default function VotingPage() {
     const handleVoteSubmit = async () => {
         setError(null);
         setStatusMessage("");
+
         const parsedOption = parseInt(voteNumber, 10);
         if (isNaN(parsedOption)) {
             setError("Введите корректный номер опции");
@@ -46,12 +47,11 @@ export default function VotingPage() {
         // Кодирование voteId
         const voteId = ethers.encodeBytes32String(id);
 
-        // Проверка перед голосованием
-        console.log("🔍 Checking vote conditions...");
+        console.log("🔍 Проверка условий голосования...");
         try {
             const check = await votingContract.checkVoteConditions(
                 voteId,
-                0, // nullifierHash placeholder, вызываем только for conditions before proof
+                0, // placeholder
                 parsedOption
             );
             console.log("✅ checkVoteConditions returned:", check);
@@ -60,30 +60,35 @@ export default function VotingPage() {
                 return;
             }
         } catch (e) {
-            console.error("❌ Ошибка при вызове checkVoteConditions:", e);
-            setError("Ошибка проверки условий: " + (e.reason || e.message));
+            console.error("❌ Ошибка при checkVoteConditions:", e);
+            setError("Ошибка проверки условий: " + (e.reason || e.data?.message || e.message));
             return;
         }
 
-        // Всё ок, теперь вызываем castVote
         console.log("🚀 Conditions OK, calling castVote()");
         try {
-            console.log("Preview voting contract address:", votingContract);
-            console.log("id:", id);
             await castVote(id, parsedOption, signer, votingContract);
-            console.log("✅ castVote succeeded");
-            setStatusMessage("Голос отправлен!");
-            // Обновим результаты после голосования
+            console.log("✅ Голос успешно отправлен!");
+
+            // Обновляем результаты
             const raw = await getResults(id, votingContract);
             console.log("🔁 Raw results after vote:", raw);
             const nums = raw.map(r => Number(r));
             console.log("🔢 Parsed results after vote:", nums);
             setResults(nums);
+
+            // 🎉 Сообщение о том, что голос отправлен
+            setStatusMessage("Голос отправлен!");
         } catch (err) {
             console.error("❌ Ошибка при голосовании:", err);
-            setError(err.message || "Произошла ошибка при голосовании");
+
+            // Покажем пользователю сообщение ошибки
+            const message = err.reason || err.data?.message || err.message || "Неизвестная ошибка";
+            setError("Ошибка при голосовании: " + message);
+            setStatusMessage(""); // Очистить "Голос отправлен!" если была ошибка
         }
     };
+
 
     return (
         <div className="flex justify-evenly items-stretch h-screen">

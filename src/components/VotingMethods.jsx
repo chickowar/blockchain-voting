@@ -125,6 +125,7 @@ export async function castVote(voteIdString, option, signer, votingContract) {
         );
     } catch (e) {
         console.error("🧨 Static call failed:", e);
+        throw e;
     }
     // console.log("castVote tx:", tx.hash);
     // await tx.wait();
