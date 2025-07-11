@@ -1,11 +1,6 @@
 # To run
-### 1) Install dependencies
 ```shell
-npm install
-```
-### 2) Run (in dev mode)
-```shell
-npm run dev
+docker compose up --build
 ```
 
 ---
