@@ -1,30 +1,26 @@
-// Из public можно доставать просто по имя_файла а из assets по ./assets/имя_файла (вроде)
-
 import SideBar from "./components/SideBar.jsx";
 import { AppProvider } from "./components/AppContext.jsx";
-import {BrowserRouter, Route, Routes} from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import VotingPage from "./pages/VotingPage.jsx";
 import CreateVotingPage from "./pages/CreateVotingPage.jsx";
 
-function BlankPage({body}) {
-  return <div className="flex h-screen w-screen clip">
-    {/*SideBar*/}
-    <SideBar/>
+function BlankPage({ body }) {
+    return (
+        <div className="flex h-screen w-screen clip">
+            {/* SideBar */}
+            <SideBar />
 
-    {/*body*/}
-    <div className="bg-background w-full">
-          {body}
-    </div>
+            {/* Body */}
+            <div className="bg-background w-full">
+                {body}
+            </div>
 
-    {/*Отступ справа*/}
-    <div className="
-      {/*bg-amber-100 */}
-      w-1/12">
-    </div>
-
-  </div>
+            {/* Отступ справа */}
+            <div className="w-1/12">{/* bg-amber-100 */}</div>
+        </div>
+    );
 }
 
 function App() {
@@ -32,37 +28,35 @@ function App() {
         <AppProvider>
             <BrowserRouter>
                 <Routes>
+                    {/* Redirect from root to /login */}
                     <Route
                         path="/"
-                        element={<BlankPage body={<span>
-                            Main
-                        </span>}/>}
+                        element={<Navigate to="/login" replace />}
                     />
 
                     <Route
                         path="/vote/:id"
-                        element={<BlankPage body={<VotingPage/>}/>}
+                        element={<BlankPage body={<VotingPage />} />}
                     />
 
                     <Route
                         path="/create"
-                        element={<BlankPage body={<CreateVotingPage/>}/>}
+                        element={<BlankPage body={<CreateVotingPage />} />}
                     />
 
                     <Route
                         path="/login"
-                        element={<BlankPage body={<LoginPage/>}/>}
+                        element={<BlankPage body={<LoginPage />} />}
                     />
 
                     <Route
                         path="*"
-                        element={<BlankPage body={<NotFoundPage/>} />}
+                        element={<BlankPage body={<NotFoundPage />} />}
                     />
-
                 </Routes>
             </BrowserRouter>
         </AppProvider>
-  );
+    );
 }
 
-export default App
+export default App;
