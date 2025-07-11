@@ -5,16 +5,6 @@ import {
     generateProof
 } from "@semaphore-protocol/proof";
 
-function packToSolidityProof(proof) {
-    // proof.points — массив из восьми координат [Ax, Ay, Bx0, Bx1, By0, By1, Cx, Cy]
-    const p = proof.points.map(x => BigInt(x));
-    return [
-        p[0], p[1],                  // A
-        p[2], p[3], p[4], p[5],      // B
-        p[6], p[7]                   // C
-    ];
-}
-
 export async function loadIdentity(voteIdString, signer) {
     const sig = await signer.signMessage(`Generate Semaphore identity for ${voteIdString}`);
     return new Identity(sig);
@@ -73,6 +63,7 @@ export async function createVote(
 export async function castVote(voteIdString, option, signer, votingContract) {
     console.log("Voting contract: ", votingContract);
     const voteId = ethers.encodeBytes32String(voteIdString);
+    console.log("Type of voteId:", typeof voteId);
 
     // 2.1) Получаем Merkle-root, конец и число опций
     const [merkleRoot, votingEnd, optionsCount] =
@@ -105,12 +96,21 @@ export async function castVote(voteIdString, option, signer, votingContract) {
     );
 
     // 2.6) Генерируем ZK-пруф и nullifierHash
-    const proof = await generateProof(
-        identity,
-        group,
-        option,            // signal
-        externalNullifier  // nullifier scope
-    );
+    let proof = null;
+    try {
+        proof = await generateProof(
+            identity,
+            group,
+            option,            // signal
+            externalNullifier  // nullifier scope
+        );
+    } catch (error) {
+        console.log("proof generating error:",error);
+        throw new Error("not allowed");
+    }
+
+    console.log("proof:", JSON.stringify(proof, null, 2));
+    console.log("proof depth:",proof.merkleTreeDepth);
 
     const nullifierHash = BigInt(String(proof.nullifier));
     console.log("nullifierHash: ", nullifierHash);
@@ -125,19 +125,60 @@ export async function castVote(voteIdString, option, signer, votingContract) {
     );
     console.log("isValidProof: ", valid);
 
-    if(valid) {
-        const tx = await votingContract.vote(
-            voteId,
-            option,
-            proof,
-        );
-        console.log("castVote tx:", tx.hash);
-        await tx.wait();
-        console.log("✅ Vote cast");
-    } else {
-        console.log("Invalid proof");
-        throw new Error("Invalid proof");
+    console.log("Calling vote from backend");
+
+    console.log("Group:", group);
+
+    // Отправка на бэкенд
+    const requestData = {
+        voteId: voteId, // Преобразуем в байтовый массив
+        option: option.toString(),       // Число -> строка (для big.Int)
+        proof: {
+            merkleTreeDepth: proof.merkleTreeDepth.toString(),
+            merkleTreeRoot: proof.merkleTreeRoot.toString(),
+            nullifier: proof.nullifier.toString(),
+            message: proof.message.toString(),
+            scope: proof.scope.toString(),
+            points: proof.points.map(p => p.toString()),
+        }
+    };
+
+    // Отправка на бэкенд
+    try {
+        const response = await fetch("/api/vote", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(requestData)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Unknown error occurred');
+        }
+
+        const result = await response.json();
+        console.log("Vote result:", result);
+        return result;
+    } catch (error) {
+        console.error("Failed to cast vote:", error);
+        throw error;
     }
+
+    // if(valid) {
+    // const tx = await votingContract.vote(
+    //     voteId,
+    //     option,
+    //     proof,
+    // );
+    // console.log("castVote tx:", tx.hash);
+    // await tx.wait();
+    // console.log("✅ Vote cast");
+    // } else {
+    //     console.log("Invalid proof");
+    //     throw new Error("Invalid proof");
+    // }
 }
 
 export async function getResults(voteIdString, votingContract) {

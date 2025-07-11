@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+
+  relayer:
+    build:
+      context: .
+    container_name: relayer
+    networks:
+      - my-network
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+
+networks:
+  my-network:
+    driver: bridge

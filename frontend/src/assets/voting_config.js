@@ -1,6 +1,6 @@
 import {ethers} from "ethers";
 
-export const VOTING_ADDRESS = "0xd4EAe144036aeDF0142974677DAFa0f9c304751F";
+export const VOTING_ADDRESS = "0x5C5FA783AFDa7Cd8d9098DE7Ca0438d59c283D73";
 export const VOTING_ABI = [
     {
         "inputs": [
@@ -161,6 +161,7 @@ export const VOTING_ABI = [
         "stateMutability": "view",
         "type": "function"
     },
+
     {
         "inputs": [
             {
@@ -209,9 +210,9 @@ export const VOTING_ABI = [
         "name": "isValidProof",
         "outputs": [
             {
-                "internalType": "bool",
+                "internalType": "string",
                 "name": "",
-                "type": "bool"
+                "type": "string"
             }
         ],
         "stateMutability": "view",
@@ -291,6 +292,7 @@ export async function getProviderSignerVotingContract() {
     const _provider = new ethers.BrowserProvider(window.ethereum);
     const _signer = await _provider.getSigner();
     const _votingContract = new ethers.Contract(VOTING_ADDRESS, VOTING_ABI, _signer);
+
 
     return {provider: _provider, votingContract: _votingContract, signer: _signer};
 }

@@ -1,0 +1,17 @@
+kafka:
+  brokers:
+    - kafka:9092
+  version: 4.0.0
+  assignor: roundrobin
+  oldest: false
+  verbose: true
+runner:
+  heartbeat_interval: 3
+  heartbeat_url: orchestrator:8080/ping
+postgresql:
+  DATABASE_PORT: 5432
+  DATABASE_USER: postgres
+  DATABASE_PASSWORD: password
+  DATABASE_NAME: scenarios
+  DATABASE_HOST: userapi_db
+  max_attempts: 5

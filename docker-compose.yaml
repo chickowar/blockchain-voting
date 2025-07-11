@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+
+  frontend:
+    networks:
+      - my-network
+    build:
+      context: ./frontend
+    ports:
+      - "1212:1212"
+
+  relayer:
+    build:
+      context: ./transaction-relayer
+    container_name: relayer
+    networks:
+      - my-network
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./transaction-relayer/.env
+
+networks:
+  my-network:
+    driver: bridge

@@ -70,7 +70,8 @@ export default function VotingPage() {
             }
         } catch (e) {
             console.error("❌ Ошибка при checkVoteConditions:", e);
-            setError("Ошибка проверки условий: " + (e.reason || e.data?.message || e.message));
+            // setError("Ошибка проверки условий: " + (e.reason || e.data?.message || e.message));
+            setError("Нельзя голосовать: Bad option");
             return;
         }
 
